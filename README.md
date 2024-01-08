@@ -10,6 +10,8 @@
 
 Express Zod Safe is a strict, typesafe middleware designed for Node.js applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries. This package seamlessly integrates with Express.js (or similar frameworks) to provide developers with a typesafe, declarative approach to ensure data integrity and prevent invalid or malicious data from affecting their applications.
 
+__This package was inspired by Aquila169's [zod-express-middleware](https://github.com/Aquila169/zod-express-middleware) package, and is intended to be a more robust and typesafe alternative.__
+
 ## 🔒 Features
 
  - **Typesafe**: Built with TypeScript, offering complete typesafe interfaces that enrich your development experience.
