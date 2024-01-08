@@ -34,7 +34,7 @@ const types = ['query', 'params', 'body'] as const;
  * };
  *
  * // Use the validate middleware in your route
- * app.get('/user/:userId', validate({ params, query, body }), (req, res) => {
+ * app.post('/user/:userId', validate({ params, query, body }), (req, res) => {
  *   // Your route logic here
  *   res.send('User data is valid!');
  * });

@@ -8,7 +8,7 @@
   </a>
 </p>
 
-Express Zod Safe is a powerful, typesafe middleware designed for Node.js applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries. This package seamlessly integrates with Express.js (or similar frameworks) to provide developers with a typesafe, declarative approach to ensure data integrity and prevent invalid or malicious data from affecting their applications.
+Express Zod Safe is a strict, typesafe middleware designed for Node.js applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries. This package seamlessly integrates with Express.js (or similar frameworks) to provide developers with a typesafe, declarative approach to ensure data integrity and prevent invalid or malicious data from affecting their applications.
 
 ### 🏠 [Homepage](https://github.com/AngaBlue/express-zod-safe)
 
@@ -35,7 +35,7 @@ npm i express-zod-safe
 npm i zod express && npm i -D @types/express
 ```
 
-## Usage
+## 🛠️ Usage
 
 ```ts
 import express from 'express';
@@ -57,7 +57,7 @@ const body = {
 };
  
 // Use the validate middleware in your route
-app.get('/user/:userId', validate({ params, query, body }), (req, res) => {
+app.post('/user/:userId', validate({ params, query, body }), (req, res) => {
   // Your route logic here
   res.send('User data is valid!');
 });
@@ -67,11 +67,37 @@ app.listen(3000, () => console.log('Server running on port 3000'));
 
 __Note:__ The `validate` middleware must be used __after__ any other middleware that parses/modifies the request body, such as `express.json()` or `express.urlencoded()`.
 
-### URL Parameters & Query Strings Coercion
+### ⚠️ URL Parameters & Query Strings Coercion
 As mentioned in the example above, all URL parameters and query strings are parsed as strings.  This means that if you have a URL parameter or query string that is expected to be a number, you must use the `z.coerce.number()` method to coerce the value to a number.  This is because Zod will not coerce the value for you, and will instead throw an error if the value is not a string.
 
-### Missing Validation Schemas
+```ts
+const params = {
+  userId: z.coerce.number(),
+};
+
+app.get('/user/:userId', validate({ params }), (req, res) => {
+  // req.params.userId -> number
+});
+```
+
+### ⚠️ Missing Validation Schemas
 If you do not provide a validation schema for a particular request component (e.g. `params`, `query`, or `body`), then that component will be assumed to be empty.  This means that requests with non-empty components will be rejected, and requests with empty components will be accepted.  The types on the `req` object will also reflect this, and will be `undefined` if the component is not provided.
+
+```ts
+const body = {
+  name: z.string(),
+  email: z.string().email(),
+};
+
+app.post('/user', validate({ body }), (req, res) => {
+  // req.body.name -> string
+  // req.body.email -> string
+  // req.params.age -> undefined
+  // req.query.age -> undefined
+});
+```
+
+This behaviour is intentional and ensures that you do not try to access or use a property that does not exist on the `req` object.
 
 ## ⭐️ Show your support
 
