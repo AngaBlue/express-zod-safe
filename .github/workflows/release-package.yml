@@ -4,7 +4,7 @@ name: Node.js Package
     tags:
       - v*
 jobs:
-  cache-and-install:
+  publish:
     runs-on: ubuntu-latest
     environment: deployment
     steps:
