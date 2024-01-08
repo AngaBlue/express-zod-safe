@@ -10,7 +10,7 @@
 
 Express Zod Safe is a strict, typesafe middleware designed for Node.js applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries. This package seamlessly integrates with Express.js (or similar frameworks) to provide developers with a typesafe, declarative approach to ensure data integrity and prevent invalid or malicious data from affecting their applications.
 
-__This package was inspired by Aquila169's [zod-express-middleware](https://github.com/Aquila169/zod-express-middleware) package, and is intended to be a more robust and typesafe alternative.__
+_This package was inspired by Aquila169's [zod-express-middleware](https://github.com/Aquila169/zod-express-middleware) package, and is intended to be a more robust and typesafe alternative._
 
 ## 🔒 Features
 
@@ -65,7 +65,7 @@ app.post('/user/:userId', validate({ params, query, body }), (req, res) => {
 app.listen(3000, () => console.log('Server running on port 3000'));
 ```
 
-__Note:__ The `validate` middleware must be used __after__ any other middleware that parses/modifies the request body, such as `express.json()` or `express.urlencoded()`.
+**Note:** The `validate` middleware must be used **after** any other middleware that parses/modifies the request body, such as `express.json()` or `express.urlencoded()`.
 
 ### ⚠️ URL Parameters & Query Strings Coercion
 As mentioned in the example above, all URL parameters and query strings are parsed as strings.  This means that if you have a URL parameter or query string that is expected to be a number, you must use the `z.coerce.number()` method to coerce the value to a number.  This is because Zod will not coerce the value for you, and will instead throw an error if the value is not a string.
