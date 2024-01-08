@@ -22,16 +22,16 @@ const types = ['query', 'params', 'body'] as const;
  * const app = express();
  *
  * // Define your Zod schemas
- * const params = z.object({
+ * const params = {
  *   userId: z.string().uuid(),
- * });
- * const query = z.object({
+ * };
+ * const query = {
  *   age: z.coerce.number().optional(),
- * });
- * const body = z.object({
+ * };
+ * const body = {
  *   name: z.string(),
  *   email: z.string().email(),
- * });
+ * };
  *
  * // Use the validate middleware in your route
  * app.get('/user/:userId', validate({ params, query, body }), (req, res) => {
