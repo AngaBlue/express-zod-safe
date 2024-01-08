@@ -41,7 +41,7 @@ const types = ['query', 'params', 'body'] as const;
  *
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
-export default function validate<TParams extends Validation = {}, TQuery extends Validation = {}, TBody extends Validation = {}>(
+function validate<TParams extends Validation = {}, TQuery extends Validation = {}, TBody extends Validation = {}>(
     schemas: ValidationSchemas<TParams, TQuery, TBody>
 ): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
     // Create validation objects for each type
@@ -78,7 +78,7 @@ type DataType = (typeof types)[number];
  * Defines the structure of an error item, containing the type of validation that failed (params, query, or body)
  * and the associated ZodError.
  */
-export interface ErrorListItem {
+interface ErrorListItem {
     type: DataType;
     errors: ZodError<any>;
 }
@@ -112,3 +112,5 @@ interface ValidationSchemas<TParams extends Validation, TQuery extends Validatio
  * @template T - The validation type (params, query, or body).
  */
 type ZodOutput<T extends Validation> = z.ZodObject<T>['_output'];
+
+export = validate;
