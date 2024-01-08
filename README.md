@@ -99,7 +99,7 @@ This behaviour is intentional and ensures that you do not try to access or use a
 
 ## ⭐️ Show your support
 
-Give a ⭐️ if this project helped you!
+Give a ⭐️ on GitHub if this project helped you!
 
 ## 📝 License
 
