@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AngaBlue/exe.git"
+    "url": "git+https://github.com/AngaBlue/express-zod-safe.git"
   },
   "keywords": [
     "zod",
@@ -23,9 +23,9 @@
   "author": "AngaBlue <contact@anga.blue>",
   "license": "LGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/AngaBlue/exe/issues"
+    "url": "https://github.com/AngaBlue/express-zod-safe/issues"
   },
-  "homepage": "https://github.com/AngaBlue/exe#readme",
+  "homepage": "https://github.com/AngaBlue/express-zod-safe#readme",
   "devDependencies": {
     "@angablue/eslint-config": "^1.4.4",
     "@types/node": "^20.10.7",
