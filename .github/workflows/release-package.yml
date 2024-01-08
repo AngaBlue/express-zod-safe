@@ -1,24 +1,38 @@
 name: Node.js Package
-
-on:
+'on':
   create:
     tags:
-      - 'v*'
-
+      - v*
 jobs:
-  publish:
+  cache-and-install:
     runs-on: ubuntu-latest
     environment: deployment
-    permissions:
-      packages: write
-      contents: read
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm install
-      - run: npm run build
-      - run: npm config set registry https://registry.npmjs.org
-      - run: npm set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
-      - run: npm publish --access public
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: '${{ env.STORE_PATH }}'
+          key: '${{ runner.os }}-pnpm-store-${{ hashFiles(''**/pnpm-lock.yaml'') }}'
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies
+        run: pnpm install
+      - run: pnpm run build
+      - run: 'pnpm config set registry https://registry.npmjs.org'
+      - run: 'pnpm set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}'
+      - run: pnpm publish --access public
