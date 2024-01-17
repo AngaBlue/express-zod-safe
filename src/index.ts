@@ -1,7 +1,16 @@
 import { RequestHandler } from 'express';
-import { ZodError, z } from 'zod';
+import { ZodError, z, ZodSchema, ZodTypeAny, ZodRawShape } from 'zod';
 
 const types = ['query', 'params', 'body'] as const;
+
+/**
+ * A ZodSchema type guard.
+ * @param schema The Zod schema to check.
+ * @returns Whether the provided schema is a ZodSchema.
+ */
+function isZodSchema(schema: any): schema is ZodSchema {
+    return schema && schema instanceof ZodSchema;
+}
 
 /**
  * Generates a middleware function for Express.js that validates request params, query, and body.
@@ -42,13 +51,13 @@ const types = ['query', 'params', 'body'] as const;
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
 function validate<TParams extends Validation = {}, TQuery extends Validation = {}, TBody extends Validation = {}>(
-    schemas: ValidationSchemas<TParams, TQuery, TBody>
+    schemas: ExtendedValidationSchemas<TParams, TQuery, TBody>
 ): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
     // Create validation objects for each type
     const validation = {
-        params: z.object(schemas.params ?? {}).strict() as z.ZodObject<TParams>,
-        query: z.object(schemas.query ?? {}).strict() as z.ZodObject<TQuery>,
-        body: z.object(schemas.body ?? {}).strict() as z.ZodObject<TBody>
+        params: isZodSchema(schemas.params) ? schemas.params : z.object(schemas.params ?? {}).strict(),
+        query: isZodSchema(schemas.query) ? schemas.query : z.object(schemas.query ?? {}).strict(),
+        body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict()
     };
 
     return (req, res, next) => {
@@ -57,7 +66,6 @@ function validate<TParams extends Validation = {}, TQuery extends Validation = {
         // Validate all types (params, query, body)
         for (const type of types) {
             const parsed = validation[type].safeParse(req[type]);
-            // @ts-expect-error This is fine
             if (parsed.success) req[type] = parsed.data;
             else errors.push({ type, errors: parsed.error });
         }
@@ -87,7 +95,7 @@ interface ErrorListItem {
  * Represents a generic type for route validation, which can be applied to params, query, or body.
  * Each key-value pair represents a field and its corresponding Zod validation schema.
  */
-type Validation = Record<string, z.ZodTypeAny>;
+type Validation = ZodTypeAny | ZodRawShape;
 
 /**
  * Defines the structure for the schemas provided to the validate middleware.
@@ -98,7 +106,7 @@ type Validation = Record<string, z.ZodTypeAny>;
  * @template TQuery - Type definition for query schema.
  * @template TBody - Type definition for body schema.
  */
-interface ValidationSchemas<TParams extends Validation, TQuery extends Validation, TBody extends Validation> {
+interface ExtendedValidationSchemas<TParams, TQuery, TBody> {
     params?: TParams;
     query?: TQuery;
     body?: TBody;
@@ -111,6 +119,6 @@ interface ValidationSchemas<TParams extends Validation, TQuery extends Validatio
  *
  * @template T - The validation type (params, query, or body).
  */
-type ZodOutput<T extends Validation> = z.ZodObject<T>['_output'];
+type ZodOutput<T extends Validation> = T extends ZodRawShape ? z.ZodObject<T>['_output'] : T['_output'];
 
 export = validate;
