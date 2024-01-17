@@ -9,7 +9,7 @@ const types = ['query', 'params', 'body'] as const;
  * @returns Whether the provided schema is a ZodSchema.
  */
 function isZodSchema(schema: any): schema is ZodSchema {
-    return schema && schema instanceof ZodSchema;
+    return schema && typeof schema.safeParse === 'function';
 }
 
 /**
