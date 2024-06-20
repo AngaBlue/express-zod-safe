@@ -67,6 +67,26 @@ app.listen(3000, () => console.log('Server running on port 3000'));
 
 **Note:** The `validate` middleware must be used **after** any other middleware that parses/modifies the request body, such as `express.json()` or `express.urlencoded()`.
 
+### 📦 Custom Error Handling
+By default, the `validate` middleware will send a 400 Bad Request response with a JSON body containing the error message.  However, you can provide your own error handling function to customize the error response.
+
+```ts
+// ... extending the previous example
+
+const handler = (errors, req, res, next) => {
+  return res.status(400).json({
+    message: 'Invalid request data',
+    errors: errors.map((error) => error.message),
+  });
+};
+
+// Use the validate middleware in your route
+app.post('/user/:userId', validate({ handler, params, query, body }), (req, res) => {
+  // Your route logic here
+  res.send('User data is valid!');
+});
+```
+
 ### ⚠️ URL Parameters & Query Strings Coercion
 As mentioned in the example above, all URL parameters and query strings are parsed as strings.  This means that if you have a URL parameter or query string that is expected to be a number, you must use the `z.coerce.number()` method to coerce the value to a number.  This is because Zod will not coerce the value for you, and will instead throw an error if the value is not a string.
 

@@ -16,7 +16,7 @@ function isZodSchema(schema: any): schema is ZodSchema {
  * Generates a middleware function for Express.js that validates request params, query, and body.
  * This function uses Zod schemas to perform validation against the provided schema definitions.
  *
- * @param schemas - An object containing Zod schemas for params, query, and body.
+ * @param schemas - An object containing Zod schemas for params, query, and body.  Optional handler for custom error handling.
  * @returns An Express.js middleware function that validates the request based on the provided schemas.
  *          It attaches validated data to the request object and sends error details if validation fails.
  * @template TParams - Type definition for params schema.
@@ -128,7 +128,7 @@ type Validation = ZodTypeAny | ZodRawShape;
 /**
  * Defines the structure for the schemas provided to the validate middleware.
  * Each property corresponds to a different part of the request (params, query, body)
- * and should be a record of Zod types for validation.
+ * and should be a record of Zod types for validation. Optional handler for custom error handling.
  *
  * @template TParams - Type definition for params schema.
  * @template TQuery - Type definition for query schema.
