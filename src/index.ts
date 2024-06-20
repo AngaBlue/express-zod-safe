@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ZodError, z, ZodSchema, ZodTypeAny, ZodRawShape } from 'zod';
 
 const types = ['query', 'params', 'body'] as const;
@@ -65,13 +65,18 @@ function validate<TParams extends Validation = {}, TQuery extends Validation = {
 
         // Validate all types (params, query, body)
         for (const type of types) {
-            const parsed = validation[type].safeParse(req[type]);
+            const parsed = validation[type].safeParse(req[type] ?? {});
             if (parsed.success) req[type] = parsed.data;
             else errors.push({ type, errors: parsed.error });
         }
 
         // Return all errors if there are any
-        if (errors.length > 0) return res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors })));
+        if (errors.length > 0) {
+            // If a custom error handler is provided, use it
+            if (schemas.handler) return schemas.handler(errors, req, res, next);
+
+            return res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors })));
+        }
 
         return next();
     };
@@ -92,6 +97,29 @@ interface ErrorListItem {
 }
 
 /**
+ * Represents a QueryString object parsed by the qs library.
+ */
+interface ParsedQs {
+    [key: string]: undefined | string | string[] | ParsedQs | ParsedQs[];
+}
+
+/**
+ * Represents an Express.js error request handler.
+ */
+type ErrorRequestHandler<
+    P = Record<string, string>,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    LocalsObj extends Record<string, any> = Record<string, any>
+> = (
+    err: ErrorListItem[],
+    req: Request<P, ResBody, ReqBody, ReqQuery, LocalsObj>,
+    res: Response<ResBody, LocalsObj>,
+    next: NextFunction
+) => void;
+
+/**
  * Represents a generic type for route validation, which can be applied to params, query, or body.
  * Each key-value pair represents a field and its corresponding Zod validation schema.
  */
@@ -107,6 +135,7 @@ type Validation = ZodTypeAny | ZodRawShape;
  * @template TBody - Type definition for body schema.
  */
 interface ExtendedValidationSchemas<TParams, TQuery, TBody> {
+    handler?: ErrorRequestHandler;
     params?: TParams;
     query?: TQuery;
     body?: TBody;
