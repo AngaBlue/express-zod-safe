@@ -74,7 +74,7 @@ By default, the `validate` middleware will send a 400 Bad Request response with 
 // ... extending the previous example
 
 const handler = (errors, req, res, next) => {
-  return res.status(400).json({
+  res.status(400).json({
     message: 'Invalid request data',
     errors: errors.map((error) => error.message),
   });
