@@ -1,4 +1,11 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-	"extends": ["@angablue/biome-config"]
+	"extends": ["@angablue/biome-config"],
+	"linter": {
+		"rules": {
+			"suspicious": {
+				"noExplicitAny": "warn"
+			}
+		}
+	}
 }

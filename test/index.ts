@@ -10,7 +10,8 @@ app.get(
 	validate({
 		handler: (errors, _req, res) => {
 			console.error(errors);
-			return res.status(400).send('Validation failed');
+			res.status(400).send('Validation failed');
+			return;
 		},
 		query: {
 			name: z.string().min(3).max(10),

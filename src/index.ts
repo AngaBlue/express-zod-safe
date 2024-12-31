@@ -62,7 +62,7 @@ function validate<TParams extends Validation = Empty, TQuery extends Validation 
 		body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict()
 	};
 
-	return (req, res, next) => {
+	return (req, res, next): void | Promise<void> => {
 		const errors: ErrorListItem[] = [];
 
 		// Validate all types (params, query, body)
@@ -77,7 +77,8 @@ function validate<TParams extends Validation = Empty, TQuery extends Validation 
 			// If a custom error handler is provided, use it
 			if (schemas.handler) return schemas.handler(errors, req, res, next);
 
-			return res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors })));
+			res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors })));
+            return;
 		}
 
 		return next();
@@ -119,7 +120,7 @@ type ErrorRequestHandler<
 	req: Request<P, ResBody, ReqBody, ReqQuery, LocalsObj>,
 	res: Response<ResBody, LocalsObj>,
 	next: NextFunction
-) => void;
+) => void | Promise<void>;
 
 /**
  * Represents a generic type for route validation, which can be applied to params, query, or body.
