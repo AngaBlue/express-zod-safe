@@ -1,44 +1,43 @@
 {
-  "name": "express-zod-safe",
-  "version": "1.2.0",
-  "description": "TypeScript-friendly middleware designed for Express applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries.",
-  "main": "dist/index.js",
-  "scripts": {
-    "clean": "rimraf dist",
-    "build": "pnpm run clean && tsc",
-    "lint": "eslint . --ext js,jsx,ts,tsx --fix"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AngaBlue/express-zod-safe.git"
-  },
-  "keywords": [
-    "zod",
-    "express",
-    "middleware",
-    "validation",
-    "guard",
-    "typesafe"
-  ],
-  "author": "AngaBlue <contact@anga.blue>",
-  "license": "LGPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/AngaBlue/express-zod-safe/issues"
-  },
-  "homepage": "https://github.com/AngaBlue/express-zod-safe#readme",
-  "devDependencies": {
-    "@angablue/eslint-config": "^1.4.5",
-    "@types/node": "^20.14.6",
-    "eslint": "^8.57.0",
-    "express": "^4.19.2",
-    "prettier": "^3.3.2",
-    "rimraf": "^5.0.7",
-    "typescript": "^5.4.5",
-    "zod": "^3.23.8"
-  },
-  "peerDependencies": {
-    "@types/express": "^4.0.0",
-    "express": "^4.0.0",
-    "zod": "^3.0.0"
-  }
+	"name": "express-zod-safe",
+	"version": "1.2.1",
+	"description": "TypeScript-friendly middleware designed for Express applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries.",
+	"main": "dist/index.js",
+	"scripts": {
+		"clean": "rimraf dist",
+		"build": "pnpm run clean && tsc",
+		"lint": "biome check --fix --error-on-warnings"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/AngaBlue/express-zod-safe.git"
+	},
+	"keywords": [
+		"zod",
+		"express",
+		"middleware",
+		"validation",
+		"guard",
+		"typesafe"
+	],
+	"author": "AngaBlue <contact@anga.blue>",
+	"license": "LGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/AngaBlue/express-zod-safe/issues"
+	},
+	"homepage": "https://github.com/AngaBlue/express-zod-safe#readme",
+	"devDependencies": {
+		"@angablue/biome-config": "^1.0.1",
+		"@biomejs/biome": "^1.9.4",
+		"@types/node": "^22.10.2",
+		"express": "^5.0.1",
+		"rimraf": "^6.0.1",
+		"typescript": "^5.7.2",
+		"zod": "^3.24.1"
+	},
+	"peerDependencies": {
+		"@types/express": "^4.0.0 || ^5.0.0",
+		"express": "^4.0.0 || ^5.0.0",
+		"zod": "^3.0.0"
+	}
 }

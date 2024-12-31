@@ -1,15 +1,17 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { ZodError, z, ZodSchema, ZodTypeAny, ZodRawShape } from 'zod';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import { type ZodError, type ZodRawShape, type ZodSchema, type ZodTypeAny, z } from 'zod';
 
 const types = ['query', 'params', 'body'] as const;
+const emptyObjectSchema = z.object({}).strict();
+type Empty = typeof emptyObjectSchema;
 
 /**
  * A ZodSchema type guard.
  * @param schema The Zod schema to check.
  * @returns Whether the provided schema is a ZodSchema.
  */
-function isZodSchema(schema: any): schema is ZodSchema {
-    return schema && typeof schema.safeParse === 'function';
+function isZodSchema(schema: unknown): schema is ZodSchema {
+	return !!schema && typeof (schema as ZodSchema).safeParse === 'function';
 }
 
 /**
@@ -50,36 +52,36 @@ function isZodSchema(schema: any): schema is ZodSchema {
  *
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
-function validate<TParams extends Validation = {}, TQuery extends Validation = {}, TBody extends Validation = {}>(
-    schemas: ExtendedValidationSchemas<TParams, TQuery, TBody>
+function validate<TParams extends Validation = Empty, TQuery extends Validation = Empty, TBody extends Validation = Empty>(
+	schemas: ExtendedValidationSchemas<TParams, TQuery, TBody>
 ): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
-    // Create validation objects for each type
-    const validation = {
-        params: isZodSchema(schemas.params) ? schemas.params : z.object(schemas.params ?? {}).strict(),
-        query: isZodSchema(schemas.query) ? schemas.query : z.object(schemas.query ?? {}).strict(),
-        body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict()
-    };
+	// Create validation objects for each type
+	const validation = {
+		params: isZodSchema(schemas.params) ? schemas.params : z.object(schemas.params ?? {}).strict(),
+		query: isZodSchema(schemas.query) ? schemas.query : z.object(schemas.query ?? {}).strict(),
+		body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict()
+	};
 
-    return (req, res, next) => {
-        const errors: Array<ErrorListItem> = [];
+	return (req, res, next) => {
+		const errors: ErrorListItem[] = [];
 
-        // Validate all types (params, query, body)
-        for (const type of types) {
-            const parsed = validation[type].safeParse(req[type] ?? {});
-            if (parsed.success) req[type] = parsed.data;
-            else errors.push({ type, errors: parsed.error });
-        }
+		// Validate all types (params, query, body)
+		for (const type of types) {
+			const parsed = validation[type].safeParse(req[type] ?? {});
+			if (parsed.success) req[type] = parsed.data;
+			else errors.push({ type, errors: parsed.error });
+		}
 
-        // Return all errors if there are any
-        if (errors.length > 0) {
-            // If a custom error handler is provided, use it
-            if (schemas.handler) return schemas.handler(errors, req, res, next);
+		// Return all errors if there are any
+		if (errors.length > 0) {
+			// If a custom error handler is provided, use it
+			if (schemas.handler) return schemas.handler(errors, req, res, next);
 
-            return res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors })));
-        }
+			return res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors })));
+		}
 
-        return next();
-    };
+		return next();
+	};
 }
 
 /**
@@ -92,31 +94,31 @@ type DataType = (typeof types)[number];
  * and the associated ZodError.
  */
 interface ErrorListItem {
-    type: DataType;
-    errors: ZodError<any>;
+	type: DataType;
+	errors: ZodError;
 }
 
 /**
  * Represents a QueryString object parsed by the qs library.
  */
 interface ParsedQs {
-    [key: string]: undefined | string | string[] | ParsedQs | ParsedQs[];
+	[key: string]: undefined | string | string[] | ParsedQs | ParsedQs[];
 }
 
 /**
  * Represents an Express.js error request handler.
  */
 type ErrorRequestHandler<
-    P = Record<string, string>,
-    ResBody = any,
-    ReqBody = any,
-    ReqQuery = ParsedQs,
-    LocalsObj extends Record<string, any> = Record<string, any>
+	P = Record<string, string>,
+	ResBody = any,
+	ReqBody = any,
+	ReqQuery = ParsedQs,
+	LocalsObj extends Record<string, any> = Record<string, any>
 > = (
-    err: ErrorListItem[],
-    req: Request<P, ResBody, ReqBody, ReqQuery, LocalsObj>,
-    res: Response<ResBody, LocalsObj>,
-    next: NextFunction
+	err: ErrorListItem[],
+	req: Request<P, ResBody, ReqBody, ReqQuery, LocalsObj>,
+	res: Response<ResBody, LocalsObj>,
+	next: NextFunction
 ) => void;
 
 /**
@@ -135,10 +137,10 @@ type Validation = ZodTypeAny | ZodRawShape;
  * @template TBody - Type definition for body schema.
  */
 interface ExtendedValidationSchemas<TParams, TQuery, TBody> {
-    handler?: ErrorRequestHandler;
-    params?: TParams;
-    query?: TQuery;
-    body?: TBody;
+	handler?: ErrorRequestHandler;
+	params?: TParams;
+	query?: TQuery;
+	body?: TBody;
 }
 
 /**

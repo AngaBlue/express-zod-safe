@@ -1,18 +1,16 @@
 {
-  "compilerOptions": {
-      "target": "ES6",
-      "module": "CommonJS",
-      "moduleResolution": "Node",
-      "declaration": true,
-      "resolveJsonModule": true,
-      "outDir": "./dist",
-      "newLine": "lf",
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
-      "strict": true,
-  },
-  "include": [
-      "src/**/*"
-  ]
+	"compilerOptions": {
+		"target": "ES6",
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"declaration": true,
+		"resolveJsonModule": true,
+		"outDir": "./dist",
+		"newLine": "lf",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true
+	},
+	"include": ["src/**/*"]
 }
