@@ -78,7 +78,7 @@ function validate<TParams extends Validation = Empty, TQuery extends Validation 
 			if (schemas.handler) return schemas.handler(errors, req, res, next);
 
 			res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors })));
-            return;
+			return;
 		}
 
 		return next();
