@@ -1,7 +1,8 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { type ZodError, type ZodRawShape, type ZodSchema, type ZodTypeAny, z } from 'zod';
+import { type ZodError, type ZodRawShape, type ZodSchema, ZodType, type ZodTypeAny, ZodTypeDef, z } from 'zod';
 
-const types = ['query', 'params', 'body'] as const;
+type SchemaType = 'query' | 'params' | 'body';
+const types: SchemaType[] = ['query', 'params', 'body'];
 const emptyObjectSchema = z.object({}).strict();
 type Empty = typeof emptyObjectSchema;
 
@@ -56,21 +57,23 @@ function validate<TParams extends Validation = Empty, TQuery extends Validation 
 	schemas: ExtendedValidationSchemas<TParams, TQuery, TBody>
 ): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
 	// Create validation objects for each type
-	const validation = {
+	const validation: Record<SchemaType, ZodType<any, ZodTypeDef, any>> = {
 		params: isZodSchema(schemas.params) ? schemas.params : z.object(schemas.params ?? {}).strict(),
 		query: isZodSchema(schemas.query) ? schemas.query : z.object(schemas.query ?? {}).strict(),
 		body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict()
 	};
+	const validSchemaTypes = Object.keys(schemas).filter(type => validation[type as SchemaType] !== undefined) as SchemaType[];
+  if (!validSchemaTypes.length) throw new Error('A valid validation type was not passed!');
 
 	return (req, res, next): void | Promise<void> => {
 		const errors: ErrorListItem[] = [];
 
 		// Validate all types (params, query, body)
-		for (const type of types) {
+		validSchemaTypes.forEach(type => {
 			const parsed = validation[type].safeParse(req[type] ?? {});
 			if (parsed.success) req[type] = parsed.data;
 			else errors.push({ type, errors: parsed.error });
-		}
+		});
 
 		// Return all errors if there are any
 		if (errors.length > 0) {
