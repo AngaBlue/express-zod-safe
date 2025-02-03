@@ -1,4 +1,6 @@
+/// <reference types="./express.d.ts" />
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import express from 'express';
 import { type ZodError, type ZodRawShape, type ZodSchema, type ZodTypeAny, z } from 'zod';
 
 const types = ['query', 'params', 'body'] as const;
@@ -12,6 +14,22 @@ type Empty = typeof emptyObjectSchema;
  */
 function isZodSchema(schema: unknown): schema is ZodSchema {
 	return !!schema && typeof (schema as ZodSchema).safeParse === 'function';
+}
+
+// Override express@^5 request.query getter to provider setter
+const descriptor = Object.getOwnPropertyDescriptor(express.request, 'query');
+if (descriptor) {
+	Object.defineProperty(express.request, 'query', {
+		get(this: Request) {
+			if (this._query) return this._query;
+			return descriptor?.get?.call(this);
+		},
+		set(this: Request, query: unknown) {
+			this._query = query;
+		},
+		configurable: true,
+		enumerable: true
+	});
 }
 
 /**
@@ -68,12 +86,8 @@ function validate<TParams extends Validation = Empty, TQuery extends Validation 
 		// Validate all types (params, query, body)
 		for (const type of types) {
 			const parsed = validation[type].safeParse(req[type] ?? {});
-			if (parsed.success) {
-				const writable = Object.getOwnPropertyDescriptor(req, type)?.writable;
-				if (writable) req[type] = parsed.data;
-			} else {
-				errors.push({ type, errors: parsed.error });
-			}
+			if (parsed.success) req[type] = parsed.data;
+			else errors.push({ type, errors: parsed.error });
 		}
 
 		// Return all errors if there are any
