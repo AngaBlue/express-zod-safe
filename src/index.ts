@@ -68,8 +68,12 @@ function validate<TParams extends Validation = Empty, TQuery extends Validation 
 		// Validate all types (params, query, body)
 		for (const type of types) {
 			const parsed = validation[type].safeParse(req[type] ?? {});
-			if (parsed.success) req[type] = parsed.data;
-			else errors.push({ type, errors: parsed.error });
+			if (parsed.success) {
+				const writable = Object.getOwnPropertyDescriptor(req, type)?.writable;
+				if (writable) req[type] = parsed.data;
+			} else {
+				errors.push({ type, errors: parsed.error });
+			}
 		}
 
 		// Return all errors if there are any
