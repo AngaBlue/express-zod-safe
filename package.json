@@ -1,6 +1,6 @@
 {
 	"name": "express-zod-safe",
-	"version": "1.3.2",
+	"version": "1.3.3",
 	"description": "TypeScript-friendly middleware designed for Express applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries.",
 	"main": "dist/index.js",
 	"scripts": {
@@ -12,7 +12,14 @@
 		"type": "git",
 		"url": "git+https://github.com/AngaBlue/express-zod-safe.git"
 	},
-	"keywords": ["zod", "express", "middleware", "validation", "guard", "typesafe"],
+	"keywords": [
+		"zod",
+		"express",
+		"middleware",
+		"validation",
+		"guard",
+		"typesafe"
+	],
 	"author": "AngaBlue <contact@anga.blue>",
 	"license": "LGPL-3.0-or-later",
 	"bugs": {
