@@ -12,14 +12,7 @@
 		"type": "git",
 		"url": "git+https://github.com/AngaBlue/express-zod-safe.git"
 	},
-	"keywords": [
-		"zod",
-		"express",
-		"middleware",
-		"validation",
-		"guard",
-		"typesafe"
-	],
+	"keywords": ["zod", "express", "middleware", "validation", "guard", "typesafe"],
 	"author": "AngaBlue <contact@anga.blue>",
 	"license": "LGPL-3.0-or-later",
 	"bugs": {
@@ -29,9 +22,9 @@
 	"devDependencies": {
 		"@angablue/biome-config": "^1.0.1",
 		"@biomejs/biome": "^1.9.4",
-		"@types/node": "^22.10.2",
+		"@types/node": "^22.13.0",
 		"rimraf": "^6.0.1",
-		"typescript": "^5.7.2",
+		"typescript": "^5.7.3",
 		"zod": "^3.24.1"
 	},
 	"peerDependencies": {
