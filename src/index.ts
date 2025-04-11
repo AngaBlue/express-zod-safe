@@ -13,7 +13,7 @@ type Empty = typeof emptyObjectSchema;
  * @returns Whether the provided schema is a ZodSchema.
  */
 function isZodSchema(schema: unknown): schema is ZodSchema {
-	return !!schema && typeof (schema as ZodSchema).safeParse === 'function';
+	return !!schema && typeof (schema as ZodSchema).safeParseAsync === 'function';
 }
 
 // Override express@^5 request.query getter to provider setter
@@ -80,12 +80,12 @@ function validate<TParams extends Validation = Empty, TQuery extends Validation 
 		body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict()
 	};
 
-	return (req, res, next): void | Promise<void> => {
+	return async (req, res, next): Promise<void> => {
 		const errors: ErrorListItem[] = [];
 
 		// Validate all types (params, query, body)
 		for (const type of types) {
-			const parsed = validation[type].safeParse(req[type] ?? {});
+			const parsed = await validation[type].safeParseAsync(req[type] ?? {});
 			if (parsed.success) req[type] = parsed.data;
 			else errors.push({ type, errors: parsed.error });
 		}
