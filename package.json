@@ -38,5 +38,10 @@
 		"@types/express": "^4.0.0 || ^5.0.0",
 		"express": "^4.0.0 || ^5.0.0",
 		"zod": "^3.0.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@biomejs/biome"
+		]
 	}
 }
