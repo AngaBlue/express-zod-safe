@@ -15,7 +15,7 @@ _This package was inspired by Aquila169's [zod-express-middleware](https://githu
 ## 🔒 Features
 
  - **Typesafe**: Built with TypeScript, offering complete typesafe interfaces that enrich your development experience.
- - **Zod Integration**: Utilizes Zod schemas for comprehensive and customizable request validation.
+ - **Zod Integration**: Utilizes Zod schemas for comprehensive and customisable request validation.
  - **Middleware Flexibility**: Easily integrates with Express.js middleware stack, ensuring a smooth validation process without compromising performance.
  - **Parameter & Query Validation**: Validates not just request bodies but also URL parameters and query strings, covering all facets of incoming data.
  - **Error Handling**: Provides detailed, developer-friendly error responses to aid in debugging and informing API consumers.
@@ -87,6 +87,40 @@ app.post('/user/:userId', validate({ handler, params, query, body }), (req, res)
 });
 ```
 
+### ⚠️ Usage with Additional Middleware
+When using `express-zod-safe` with other middleware, it is important not to explicitly type the `Request` parameter in the middleware, as this will override the inferred type that `express-zod-safe` generates from your validation schemas.  The best way to do this is to instead type your other middleware (or cast them) to `WeakRequestHandler`, a weakly typed version of the `RequestHandler` type from `express`.
+
+```ts
+import validate, { type WeakRequestHandler } from 'express-zod-safe';
+
+// Use the RequestHandler type, instead of explicitly typing (req: Request, res: Response, next: NextFunction)
+const authenticate: WeakRequestHandler = (req, res, next) => {
+  // ... perform user authentication
+
+  next();
+};
+
+app.post('/user/:userId', authenticate, validate({ params, query, body }), (req, res) => {
+  // Your validation typing will work as expected here
+});
+
+```
+
+If you do not control the middleware, such as when you import it from another library, you can instead cast the middleware to `RequestHandler` via `unknown`.
+
+```ts
+// For one off cases...
+app.post('/user/:userId', authenticate as unknown as WeakRequestHandler, validate({ params, query, body }), (req, res) => {
+  // Your validation typing will work as expected here
+});
+
+// For middleware with a lot of re-use
+const inferredAuthenticate = authenticate as unknown as WeakRequestHandler;
+app.post('/user/:userId', inferredAuthenticate, validate({ params, query, body }), (req, res) => {
+  // Your validation typing will work as expected here
+});
+```
+
 ### ⚠️ URL Parameters & Query Strings Coercion
 As mentioned in the example above, all URL parameters and query strings are parsed as strings.  This means that if you have a URL parameter or query string that is expected to be a number, you must use the `z.coerce.number()` method to coerce the value to a number.  This is because Zod will not coerce the value for you, and will instead throw an error if the value is not a string.
 
@@ -101,7 +135,7 @@ app.get('/user/:userId', validate({ params }), (req, res) => {
 ```
 
 ### ⚠️ Missing Validation Schemas
-If you do not provide a validation schema for a particular request component (e.g. `params`, `query`, or `body`), then that component will be assumed to be empty.  This means that requests with non-empty components will be rejected, and requests with empty components will be accepted.  The types on the `req` object will also reflect this, and will be `undefined` if the component is not provided.
+If you do not provide a validation schema for a particular request component (e.g. `params`, `query`, or `body`), then that component will be assumed to be empty.  This means that requests with non-empty components will be rejected, and requests with empty components will be accepted.  The types on the `req` object will also reflect this, and will be an empty object `{}` if the component is not provided.
 
 ```ts
 const body = {
@@ -112,12 +146,28 @@ const body = {
 app.post('/user', validate({ body }), (req, res) => {
   // req.body.name -> string
   // req.body.email -> string
-  // req.params.age -> undefined
-  // req.query.age -> undefined
+  // req.params.age -> Property 'age' does not exist on type '{}'
+  // req.query.age -> Property 'age' does not exist on type '{}'
 });
 ```
 
-This behaviour is intentional and ensures that you do not try to access or use a property that does not exist on the `req` object.
+This behaviour is intentional and ensures that you do not try to access or use a property that does not exist on the `req` object.  If you'd prefer to allow any property for any given request component, you can do so by setting a loose validation schema with `z.any()`.
+
+```ts
+const body = {
+  name: z.string(),
+  email: z.string().email(),
+};
+
+const params = z.any()
+
+app.post('/user', validate({ body, params }), (req, res) => {
+  // req.body.name -> string
+  // req.body.email -> string
+  // req.params.age -> any
+  // req.query.age -> Property 'age' does not exist on type '{}'
+});
+```
 
 ## ⭐️ Show your support
 
