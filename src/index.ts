@@ -155,7 +155,11 @@ type Validation = ZodTypeAny | ZodRawShape;
  * @template TQuery - Type definition for query schema.
  * @template TBody - Type definition for body schema.
  */
-interface ExtendedValidationSchemas<TParams, TQuery, TBody> {
+interface ExtendedValidationSchemas<
+	TParams extends Validation = Empty,
+	TQuery extends Validation = Empty,
+	TBody extends Validation = Empty
+> {
 	handler?: ErrorRequestHandler;
 	params?: TParams;
 	query?: TQuery;
