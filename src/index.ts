@@ -175,4 +175,9 @@ interface ExtendedValidationSchemas<
  */
 type ZodOutput<T extends Validation> = T extends ZodRawShape ? z.ZodObject<T>['_output'] : T['_output'];
 
-export = validate;
+/**
+ * A utility type to ensure other middleware types don't conflict with the validate middleware.
+ */
+export type WeakRequestHandler = RequestHandler<any, any, any, Record<string, any>>;
+
+export default validate;
