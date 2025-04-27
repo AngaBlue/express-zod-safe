@@ -2,24 +2,19 @@
 	"name": "express-zod-safe",
 	"version": "1.4.0",
 	"description": "TypeScript-friendly middleware designed for Express applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries.",
-	"main": "dist/index.js",
+	"main": "dist/cjs/index.js",
+	"module": "dist/esm/index.js",
+	"types": "dist/esm/index.d.ts",
 	"scripts": {
 		"clean": "rimraf dist",
-		"build": "pnpm run clean && tsc",
-		"lint": "biome check --fix --error-on-warnings"
+		"build": "pnpm run clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+		"lint": "biome check --fix"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/AngaBlue/express-zod-safe.git"
 	},
-	"keywords": [
-		"zod",
-		"express",
-		"middleware",
-		"validation",
-		"guard",
-		"typesafe"
-	],
+	"keywords": ["zod", "express", "middleware", "validation", "guard", "typesafe"],
 	"author": "AngaBlue <contact@anga.blue>",
 	"license": "LGPL-3.0-or-later",
 	"bugs": {
@@ -40,8 +35,6 @@
 		"zod": "^3.0.0"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome"]
 	}
 }
