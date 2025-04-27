@@ -106,17 +106,17 @@ app.post('/user/:userId', authenticate, validate({ params, query, body }), (req,
 
 ```
 
-If you do not control the middleware, such as when you import it from another library, you can instead cast the middleware to `RequestHandler` via `unknown`.
+If you do not control the middleware, such as when you import it from another library, you can instead cast the middleware to `WeakRequestHandler`.
 
 ```ts
 // For one off cases...
-app.post('/user/:userId', authenticate as unknown as WeakRequestHandler, validate({ params, query, body }), (req, res) => {
+app.post('/user/:userId', authenticate as WeakRequestHandler, validate({ params, query, body }), (req, res) => {
   // Your validation typing will work as expected here
 });
 
-// For middleware with a lot of re-use
-const inferredAuthenticate = authenticate as unknown as WeakRequestHandler;
-app.post('/user/:userId', inferredAuthenticate, validate({ params, query, body }), (req, res) => {
+// For a middleware with a lot of use, aliasing the middleware...
+const auth = authenticate as WeakRequestHandler;
+app.post('/user/:userId', auth, validate({ params, query, body }), (req, res) => {
   // Your validation typing will work as expected here
 });
 ```
