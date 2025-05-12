@@ -1,13 +1,13 @@
 <h1 align="center">🛡️ Express Zod Safe</h1>
 <p align="center">
   <a href="https://www.npmjs.com/package/express-zod-safe" target="_blank">
-    <img alt="Downloads" src="https://img.shields.io/npm/dm/express-zod-safe.svg?color=blue&?label=Downloads">
+    <img alt="Downloads" src="https://img.shields.io/npm/dm/express-zod-safe.svg?color=blue&label=Downloads">
   </a>
   <a href="https://www.npmjs.com/package/express-zod-safe" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/express-zod-safe.svg?label=Version">
   </a>
   <a href="https://github.com/AngaBlue/exe/blob/master/LICENSE" target="_blank">
-    <img alt="License: MIT" src="https://img.shields.io/npm/l/express-zod-safe?color=green?label=Licence" />
+    <img alt="License: MIT" src="https://img.shields.io/npm/l/express-zod-safe?color=green&label=Licence" />
   </a>
 </p>
 
