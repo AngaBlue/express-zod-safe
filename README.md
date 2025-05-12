@@ -7,7 +7,7 @@
     <img alt="Version" src="https://img.shields.io/npm/v/express-zod-safe.svg?label=Version">
   </a>
   <a href="https://github.com/AngaBlue/exe/blob/master/LICENSE" target="_blank">
-    <img alt="License: MIT" src="https://img.shields.io/npm/l/express-zod-safe?color=green&label=Licence" />
+    <img alt="Licence: MIT" src="https://img.shields.io/npm/l/express-zod-safe?color=green&label=Licence" />
   </a>
 </p>
 
