@@ -1,10 +1,13 @@
 <h1 align="center">🛡️ Express Zod Safe</h1>
 <p align="center">
-    <a href="https://www.npmjs.com/package/express-zod-safe" target="_blank">
-  <img alt="GitHub tag (latest by date)" src="https://img.shields.io/github/v/tag/AngaBlue/express-zod-safe?label=Version">
+  <a href="https://www.npmjs.com/package/express-zod-safe" target="_blank">
+    <img alt="Downloads" src="https://img.shields.io/npm/dm/express-zod-safe.svg?color=blue&?label=Downloads">
   </a>
-  <a href="https://github.com/AngaBlue/express-zod-safe/blob/master/LICENSE" target="_blank">
-    <img alt="License: LGPL--3.0--or--later" src="https://img.shields.io/github/license/AngaBlue/express-zod-safe?color=green" />
+  <a href="https://www.npmjs.com/package/express-zod-safe" target="_blank">
+    <img alt="Version" src="https://img.shields.io/npm/v/express-zod-safe.svg?label=Version">
+  </a>
+  <a href="https://github.com/AngaBlue/exe/blob/master/LICENSE" target="_blank">
+    <img alt="License: MIT" src="https://img.shields.io/npm/l/express-zod-safe?color=green?label=Licence" />
   </a>
 </p>
 
@@ -15,7 +18,7 @@ _This package was inspired by Aquila169's [zod-express-middleware](https://githu
 ## 🔒 Features
 
  - **Typesafe**: Built with TypeScript, offering complete typesafe interfaces that enrich your development experience.
- - **Zod Integration**: Utilizes Zod schemas for comprehensive and customisable request validation.
+ - **Zod Integration**: Utilises Zod schemas for comprehensive and customisable request validation.
  - **Middleware Flexibility**: Easily integrates with Express.js middleware stack, ensuring a smooth validation process without compromising performance.
  - **Parameter & Query Validation**: Validates not just request bodies but also URL parameters and query strings, covering all facets of incoming data.
  - **Error Handling**: Provides detailed, developer-friendly error responses to aid in debugging and informing API consumers.
@@ -68,7 +71,7 @@ app.listen(3000, () => console.log('Server running on port 3000'));
 **Note:** The `validate` middleware must be used **after** any other middleware that parses/modifies the request body, such as `express.json()` or `express.urlencoded()`.
 
 ### 📦 Custom Error Handling
-By default, the `validate` middleware will send a 400 Bad Request response with a JSON body containing the error message.  However, you can provide your own error handling function to customize the error response.
+By default, the `validate` middleware will send a 400 Bad Request response with a JSON body containing the error message.  However, you can provide your own error handling function to customise the error response.
 
 ```ts
 // ... extending the previous example
@@ -176,4 +179,4 @@ Give a ⭐️ on GitHub if this project helped you!
 ## 📝 License
 
 Copyright © [AngaBlue](https://github.com/AngaBlue).<br />
-This project is [LGPL--3.0--or--later](https://github.com/AngaBlue/express-zod-safe/blob/master/LICENSE) licensed.
+This project is [MIT](https://github.com/AngaBlue/express-zod-safe/blob/master/LICENSE) licensed.
