@@ -2,12 +2,24 @@
 	"name": "express-zod-safe",
 	"version": "1.5.2",
 	"description": "TypeScript-friendly middleware designed for Express applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries.",
-	"main": "dist/cjs/index.js",
-	"module": "dist/esm/index.js",
-	"types": "dist/esm/index.d.ts",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+  	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.mts",
+				"default": "./dist/index.mjs"
+			},
+			"require": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			}
+		}
+	},
 	"scripts": {
 		"clean": "rimraf dist",
-		"build": "pnpm run clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+		"build": "tsup",
 		"lint": "biome check --fix"
 	},
 	"repository": {
@@ -37,6 +49,7 @@
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^22.15.17",
 		"rimraf": "^6.0.1",
+		"tsup": "^8.5.0",
 		"typescript": "^5.8.3",
 		"zod": "^3.24.4"
 	},
@@ -49,5 +62,6 @@
 		"onlyBuiltDependencies": [
 			"@biomejs/biome"
 		]
-	}
+	},
+	"packageManager": "pnpm@10.11.0"
 }
