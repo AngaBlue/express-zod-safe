@@ -70,7 +70,7 @@ if (descriptor) {
  *
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
-export default function validate<
+export function validate<
 	TParams extends ValidationSchema = EmptyValidationSchema,
 	TQuery extends ValidationSchema = EmptyValidationSchema,
 	TBody extends ValidationSchema = EmptyValidationSchema
@@ -104,6 +104,7 @@ export default function validate<
 		return next();
 	};
 }
+export default validate;
 
 /**
  * Describes the types of data that can be validated: 'query', 'params', or 'body'.
