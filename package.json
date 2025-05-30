@@ -5,7 +5,7 @@
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.ts",
-  	"exports": {
+	"exports": {
 		".": {
 			"import": {
 				"types": "./dist/index.d.mts",
@@ -18,7 +18,6 @@
 		}
 	},
 	"scripts": {
-		"clean": "rimraf dist",
 		"build": "tsup",
 		"lint": "biome check --fix"
 	},
@@ -26,14 +25,7 @@
 		"type": "git",
 		"url": "git+https://github.com/AngaBlue/express-zod-safe.git"
 	},
-	"keywords": [
-		"zod",
-		"express",
-		"middleware",
-		"validation",
-		"guard",
-		"typesafe"
-	],
+	"keywords": ["zod", "express", "middleware", "validation", "guard", "typesafe"],
 	"author": {
 		"name": "AngaBlue",
 		"email": "contact@anga.blue",
@@ -48,7 +40,6 @@
 		"@angablue/biome-config": "^1.0.4",
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^22.15.17",
-		"rimraf": "^6.0.1",
 		"tsup": "^8.5.0",
 		"typescript": "^5.8.3",
 		"zod": "^3.24.4"
@@ -59,9 +50,7 @@
 		"zod": "^3.0.0"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome", "esbuild"]
 	},
 	"packageManager": "pnpm@10.11.0"
 }

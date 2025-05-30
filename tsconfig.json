@@ -1,17 +1,14 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "outDir": "dist",
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["ES2022"],
-    "strict": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "types": ["node"]
-	
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"baseUrl": ".",
+		"outDir": "dist",
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"newLine": "lf",
+		"strict": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true
+	},
+	"include": ["src/**/*"]
 }
