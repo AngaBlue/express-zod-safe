@@ -174,5 +174,3 @@ export type ZodOutput<T extends ValidationSchema> = T extends ZodRawShape ? z.Zo
  * A utility type to ensure other middleware types don't conflict with the validate middleware.
  */
 export type WeakRequestHandler = RequestHandler<unknown, unknown, unknown, Record<string, unknown>>;
-
-module.exports = validate;
