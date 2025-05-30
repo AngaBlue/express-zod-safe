@@ -16,14 +16,14 @@ importers:
         version: 5.0.1
     devDependencies:
       '@angablue/biome-config':
-        specifier: ^1.0.4
-        version: 1.0.4(@biomejs/biome@1.9.4)
+        specifier: ^1.0.5
+        version: 1.0.5(@biomejs/biome@1.9.4)
       '@biomejs/biome':
         specifier: ^1.9.4
         version: 1.9.4
       '@types/node':
-        specifier: ^22.15.17
-        version: 22.15.17
+        specifier: ^22.15.26
+        version: 22.15.26
       tsup:
         specifier: ^8.5.0
         version: 8.5.0(typescript@5.8.3)
@@ -31,13 +31,13 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       zod:
-        specifier: ^3.24.4
-        version: 3.24.4
+        specifier: ^3.25.39
+        version: 3.25.39
 
 packages:
 
-  '@angablue/biome-config@1.0.4':
-    resolution: {integrity: sha512-tlBo7gxbBnGwHW8sQiN1O+hXajKxeVZ9wxq3x93D0qclLYI1XDVpVrz9USun25MO62fzrKhWJ0YRAyWBciY21Q==}
+  '@angablue/biome-config@1.0.5':
+    resolution: {integrity: sha512-2+HfRAt53GthUVCaos5sqbvuBIoWJXyFF8+rA1w4p0K56KLb5Ae7V1+HiAjC9cXwZVxjSS3ynJ9gdzWfHfU0Aw==}
     peerDependencies:
       '@biomejs/biome': ^1.9.4
 
@@ -397,8 +397,8 @@ packages:
   '@types/node@22.10.2':
     resolution: {integrity: sha512-Xxr6BBRCAOQixvonOye19wnzyDiUtTeqldOOmj3CkeblonbccA12PFwlufvRdrpjXxqnmUaeiU5EOA+7s5diUQ==}
 
-  '@types/node@22.15.17':
-    resolution: {integrity: sha512-wIX2aSZL5FE+MR0JlvF87BNVrtFWf6AE6rxSE9X7OwnVvoyCQjpzSRJ+M87se/4QCkCiebQAqrJ0y6fwIyi7nw==}
+  '@types/node@22.15.26':
+    resolution: {integrity: sha512-lgISkNrqdQ5DAzjBhnDNGKDuXDNo7/1V4FhNzsKREhWLZTOELQAptuAnJMzHtUl1qyEBBy9lNBKQ9WjyiSloTw==}
 
   '@types/qs@6.9.11':
     resolution: {integrity: sha512-oGk0gmhnEJK4Yyk+oI7EfXsLayXatCWPHary1MtcmbAifkobT9cM9yutG/hZKIseOU0MqbIwQ/u2nn/Gb+ltuQ==}
@@ -1072,12 +1072,12 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  zod@3.24.4:
-    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
+  zod@3.25.39:
+    resolution: {integrity: sha512-yrva2T2x4R+FMFTPBVD/YPS7ct8njqjnV93zNx/MlwqLAxcnxwRGbXWyWF63/nErl3rdRd8KARObon7BiWzabQ==}
 
 snapshots:
 
-  '@angablue/biome-config@1.0.4(@biomejs/biome@1.9.4)':
+  '@angablue/biome-config@1.0.5(@biomejs/biome@1.9.4)':
     dependencies:
       '@biomejs/biome': 1.9.4
 
@@ -1315,7 +1315,7 @@ snapshots:
     dependencies:
       undici-types: 6.20.0
 
-  '@types/node@22.15.17':
+  '@types/node@22.15.26':
     dependencies:
       undici-types: 6.21.0
 
@@ -2017,4 +2017,4 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  zod@3.24.4: {}
+  zod@3.25.39: {}
