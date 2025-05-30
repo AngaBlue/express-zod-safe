@@ -19,7 +19,8 @@
 	},
 	"scripts": {
 		"build": "tsup",
-		"lint": "biome check --fix"
+		"lint": "biome check --fix",
+		"test": "pnpx tsx ./test/index.ts"
 	},
 	"repository": {
 		"type": "git",
