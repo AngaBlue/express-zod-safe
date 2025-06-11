@@ -3,7 +3,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import express from 'express';
 import { type ZodError, type ZodRawShape, type ZodSchema, type ZodTypeAny, z } from 'zod';
 
-const types = ['query', 'params', 'body'] as const;
+const types = ['query', 'params', 'body', 'headers'] as const;
 const emptyObjectSchema = z.object({}).strict();
 export type EmptyValidationSchema = typeof emptyObjectSchema;
 
@@ -73,13 +73,15 @@ if (descriptor) {
 export default function validate<
 	TParams extends ValidationSchema = EmptyValidationSchema,
 	TQuery extends ValidationSchema = EmptyValidationSchema,
-	TBody extends ValidationSchema = EmptyValidationSchema
->(schemas: CompleteValidationSchema<TParams, TQuery, TBody>): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
+	TBody extends ValidationSchema = EmptyValidationSchema,
+	THeaders extends ValidationSchema = EmptyValidationSchema
+>(schemas: CompleteValidationSchema<TParams, TQuery, TBody, THeaders>): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
 	// Create validation objects for each type
 	const validation = {
 		params: isZodSchema(schemas.params) ? schemas.params : z.object(schemas.params ?? {}).strict(),
 		query: isZodSchema(schemas.query) ? schemas.query : z.object(schemas.query ?? {}).strict(),
-		body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict()
+		body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict(),
+		headers: isZodSchema(schemas.headers) ? schemas.headers : z.object(schemas.headers ?? {})
 	};
 
 	return async (req, res, next): Promise<void> => {
@@ -106,12 +108,12 @@ export default function validate<
 }
 
 /**
- * Describes the types of data that can be validated: 'query', 'params', or 'body'.
+ * Describes the types of data that can be validated: 'query', 'params', 'body' or headers.
  */
 type DataType = (typeof types)[number];
 
 /**
- * Defines the structure of an error item, containing the type of validation that failed (params, query, or body)
+ * Defines the structure of an error item, containing the type of validation that failed (params, query, body or headers)
  * and the associated ZodError.
  */
 export interface ErrorListItem {
@@ -136,7 +138,7 @@ export type ErrorRequestHandler<
 ) => void | Promise<void>;
 
 /**
- * Represents a generic type for route validation, which can be applied to params, query, or body.
+ * Represents a generic type for route validation, which can be applied to params, query, body or headers.
  * Each key-value pair represents a field and its corresponding Zod validation schema.
  */
 export type ValidationSchema = ZodTypeAny | ZodRawShape;
@@ -153,12 +155,14 @@ export type ValidationSchema = ZodTypeAny | ZodRawShape;
 export interface CompleteValidationSchema<
 	TParams extends ValidationSchema = EmptyValidationSchema,
 	TQuery extends ValidationSchema = EmptyValidationSchema,
-	TBody extends ValidationSchema = EmptyValidationSchema
+	TBody extends ValidationSchema = EmptyValidationSchema,
+	THeaders extends ValidationSchema = EmptyValidationSchema
 > {
 	handler?: ErrorRequestHandler;
 	params?: TParams;
 	query?: TQuery;
 	body?: TBody;
+	headers?: THeaders;
 }
 
 /**
