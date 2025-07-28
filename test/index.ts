@@ -22,6 +22,10 @@ const params = {
 	id: z.coerce.number()
 };
 
+const headers = {
+	'x-header': z.string().uuid()
+};
+
 app.get(
 	'/:id',
 	authenticate as WeakRequestHandler,
@@ -33,7 +37,8 @@ app.get(
 		},
 		body,
 		query,
-		params
+		params,
+		headers
 	}),
 	(req, res) => {
 		const { name, age } = req.query;
