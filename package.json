@@ -1,6 +1,6 @@
 {
 	"name": "express-zod-safe",
-	"version": "1.5.4",
+	"version": "2.0.0",
 	"description": "TypeScript-friendly middleware designed for Express applications, leveraging the robustness of Zod schemas to validate incoming request bodies, parameters, and queries.",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
