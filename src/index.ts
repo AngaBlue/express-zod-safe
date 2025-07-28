@@ -1,19 +1,19 @@
 /// <reference types="./express.d.ts" />
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import express from 'express';
-import { type ZodError, type ZodRawShape, type ZodSchema, type ZodTypeAny, z } from 'zod';
+import { type ZodError, type ZodRawShape, type ZodType, z } from 'zod';
 
 const types = ['query', 'params', 'body', 'headers'] as const;
 const emptyObjectSchema = z.object({}).strict();
 export type EmptyValidationSchema = typeof emptyObjectSchema;
 
 /**
- * A ZodSchema type guard.
- * @param schema The Zod schema to check.
- * @returns Whether the provided schema is a ZodSchema.
+ * A ZodType type guard.
+ * @param type The Zod type to check.
+ * @returns Whether the provided type is a ZodType.
  */
-function isZodSchema(schema: unknown): schema is ZodSchema {
-	return !!schema && typeof (schema as ZodSchema).safeParseAsync === 'function';
+function isZodType(type: unknown): type is ZodType {
+	return !!type && typeof (type as ZodType).safeParseAsync === 'function';
 }
 
 // Override express@^5 request.query getter to provider setter
@@ -42,6 +42,7 @@ if (descriptor) {
  * @template TParams - Type definition for params schema.
  * @template TQuery - Type definition for query schema.
  * @template TBody - Type definition for body schema.
+ * @template THeaders - Type definition for headers schema.
  * @example
  * // Example usage in an Express.js route
  * import express from 'express';
@@ -78,14 +79,16 @@ export default function validate<
 >(schemas: CompleteValidationSchema<TParams, TQuery, TBody, THeaders>): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
 	// Create validation objects for each type
 	const validation = {
-		params: isZodSchema(schemas.params) ? schemas.params : z.object(schemas.params ?? {}).strict(),
-		query: isZodSchema(schemas.query) ? schemas.query : z.object(schemas.query ?? {}).strict(),
-		body: isZodSchema(schemas.body) ? schemas.body : z.object(schemas.body ?? {}).strict(),
-		headers: isZodSchema(schemas.headers) ? schemas.headers : z.object(schemas.headers ?? {})
+		params: isZodType(schemas.params) ? schemas.params : z.strictObject(schemas.params ?? {}),
+		query: isZodType(schemas.query) ? schemas.query : z.strictObject(schemas.query ?? {}),
+		body: isZodType(schemas.body) ? schemas.body : z.strictObject(schemas.body ?? {}),
+		headers: isZodType(schemas.headers) ? schemas.headers : z.looseObject(schemas.headers ?? {})
 	};
 
 	return async (req, res, next): Promise<void> => {
 		const errors: ErrorListItem[] = [];
+
+		req.headers
 
 		// Validate all types (params, query, body)
 		for (const type of types) {
@@ -108,7 +111,7 @@ export default function validate<
 }
 
 /**
- * Describes the types of data that can be validated: 'query', 'params', 'body' or headers.
+ * Describes the types of data that can be validated: 'query', 'params', 'body' or 'headers'.
  */
 type DataType = (typeof types)[number];
 
@@ -141,7 +144,7 @@ export type ErrorRequestHandler<
  * Represents a generic type for route validation, which can be applied to params, query, body or headers.
  * Each key-value pair represents a field and its corresponding Zod validation schema.
  */
-export type ValidationSchema = ZodTypeAny | ZodRawShape;
+export type ValidationSchema = ZodType | ZodRawShape;
 
 /**
  * Defines the structure for the schemas provided to the validate middleware.
@@ -172,7 +175,7 @@ export interface CompleteValidationSchema<
  *
  * @template T - The validation type (params, query, or body).
  */
-export type ZodOutput<T extends ValidationSchema> = T extends ZodRawShape ? z.ZodObject<T>['_output'] : T['_output'];
+export type ZodOutput<T extends ValidationSchema> = z.output<T extends ZodRawShape ? z.ZodObject<T> : T>;
 
 /**
  * A utility type to ensure other middleware types don't conflict with the validate middleware.

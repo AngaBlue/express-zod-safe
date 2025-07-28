@@ -172,6 +172,8 @@ app.post('/user', validate({ body, params }), (req, res) => {
 });
 ```
 
+Notably this behaviours doesn't apply to `headers` as they are often outside of the developers control with headers being added/modified/removed by the browser or in transit.
+
 ## ⭐️ Show your support
 
 Give a ⭐️ on GitHub if this project helped you!
