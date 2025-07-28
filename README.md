@@ -38,6 +38,8 @@ npm i express-zod-safe
 npm i zod express && npm i -D @types/express
 ```
 
+⚠️ Warning ⚠️: This package is designed to work with Zod `v4.0.0` and above.  If you are using Zod `v3.x.x`, you will need to use `express-zod-safe@1.5.4`.
+
 ## 🛠️ Usage
 
 ```ts
