@@ -174,3 +174,40 @@ export type ZodOutput<T extends ValidationSchema> = z.output<T extends ZodRawSha
  * A utility type to ensure other middleware types don't conflict with the validate middleware.
  */
 export type WeakRequestHandler = RequestHandler<unknown, unknown, unknown, Record<string, unknown>>;
+
+type Schemas = Partial<Record<'params' | 'query' | 'body', ZodType>>;
+
+/**
+ * A utility type to ensure the request object is typed correctly.
+ * @template T - The schemas to use for the request object.
+ * @returns The request object with the correct types.
+ * @example
+ * import { TypedRequest } from 'express-zod-safe';
+ * import { z } from 'zod';
+ * 
+ * const schemas = {
+ *   params: z.object({
+ *     slug: z.string().min(1)
+ *   }),
+ *   query: z.object({
+ *     page: z.coerce.number().min(1)
+ *   }),
+ *   body: z.object({
+ *     title: z.string().min(1)
+ *   })
+ * };
+ * 
+ * const typedHelper = (req: TypedRequest<typeof schemas>, res: Response) => {
+ *   const { slug } = req.params;
+ *   const { page } = req.query;
+ *   const { title } = req.body;
+ *   res.send(`Hello ${slug}! (Your page is ${page}) (Your title is ${title})`);
+ * };
+ * 
+ */
+export type TypedRequest<T extends Schemas> = Request<
+	T['params'] extends ZodType ? z.output<T['params']> : Request['params'],
+	any,
+	T['body'] extends ZodType ? z.output<T['body']> : Request['body'],
+	T['query'] extends ZodType ? z.output<T['query']> : Request['query']
+>;
