@@ -4,8 +4,7 @@ import express from 'express';
 import { type ZodError, type ZodRawShape, type ZodType, z } from 'zod';
 
 const types = ['query', 'params', 'body'] as const;
-const emptyObjectSchema = z.object({}).strict();
-export type EmptyValidationSchema = typeof emptyObjectSchema;
+export type Unvalidated = unknown;
 
 /**
  * A ZodType type guard.
@@ -71,9 +70,9 @@ if (descriptor) {
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
 export default function validate<
-	TParams extends ValidationSchema = EmptyValidationSchema,
-	TQuery extends ValidationSchema = EmptyValidationSchema,
-	TBody extends ValidationSchema = EmptyValidationSchema
+	TParams extends ValidationSchema,
+	TQuery extends ValidationSchema,
+	TBody extends ValidationSchema
 >(schemas: CompleteValidationSchema<TParams, TQuery, TBody>): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
 	// Create validation objects for each type
 	const validation = {
@@ -123,9 +122,9 @@ export interface ErrorListItem {
  * Represents an Express.js error request handler where the params, query and body are of unknown type as validation failed.
  */
 export type ErrorRequestHandler<
-	P = unknown,
+	P = Unvalidated,
 	ResBody = any,
-	ReqBody = unknown,
+	ReqBody = Unvalidated,
 	ReqQuery = unknown,
 	LocalsObj extends Record<string, any> = Record<string, any>
 > = (
@@ -151,9 +150,9 @@ export type ValidationSchema = ZodType | ZodRawShape;
  * @template TBody - Type definition for body schema.
  */
 export interface CompleteValidationSchema<
-	TParams extends ValidationSchema = EmptyValidationSchema,
-	TQuery extends ValidationSchema = EmptyValidationSchema,
-	TBody extends ValidationSchema = EmptyValidationSchema
+	TParams extends ValidationSchema,
+	TQuery extends ValidationSchema,
+	TBody extends ValidationSchema
 > {
 	handler?: ErrorRequestHandler;
 	params?: TParams;
@@ -168,14 +167,12 @@ export interface CompleteValidationSchema<
  *
  * @template T - The validation type (params, query, or body).
  */
-export type ZodOutput<T extends ValidationSchema> = z.output<T extends ZodRawShape ? z.ZodObject<T> : T>;
+export type ZodOutput<T extends ValidationSchema | undefined> = T extends ValidationSchema ? z.output<T extends ZodRawShape ? z.ZodObject<T> : T> : Unvalidated;
 
 /**
  * A utility type to ensure other middleware types don't conflict with the validate middleware.
  */
-export type WeakRequestHandler = RequestHandler<unknown, unknown, unknown, Record<string, unknown>>;
-
-type Schemas = Partial<Record<'params' | 'query' | 'body', ZodType>>;
+export type WeakRequestHandler = RequestHandler<Unvalidated, Unvalidated, Unvalidated, Unvalidated>;
 
 /**
  * A utility type to ensure the request object is typed correctly.
@@ -205,9 +202,9 @@ type Schemas = Partial<Record<'params' | 'query' | 'body', ZodType>>;
  * };
  * 
  */
-export type TypedRequest<T extends Schemas> = Request<
-	T['params'] extends ZodType ? z.output<T['params']> : Request['params'],
+export type TypedRequest<T extends CompleteValidationSchema<ValidationSchema, ValidationSchema, ValidationSchema>> = Request<
+	ZodOutput<T['params']>,
 	any,
-	T['body'] extends ZodType ? z.output<T['body']> : Request['body'],
-	T['query'] extends ZodType ? z.output<T['query']> : Request['query']
+	ZodOutput<T['body']>,
+	ZodOutput<T['query']>
 >;

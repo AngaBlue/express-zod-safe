@@ -56,7 +56,6 @@ const typedSchema = {
 };
 
 const typedHelper = (req: TypedRequest<typeof typedSchema>, res: Response) => {
-
 	const { slug } = req.params;
 	const { page } = req.query;
 	const { title } = req.body;
