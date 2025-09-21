@@ -150,9 +150,9 @@ export type ValidationSchema = ZodType | ZodRawShape;
  * @template TBody - Type definition for body schema.
  */
 export interface CompleteValidationSchema<
-	TParams extends ValidationSchema,
-	TQuery extends ValidationSchema,
-	TBody extends ValidationSchema
+	TParams extends ValidationSchema = ValidationSchema,
+	TQuery extends ValidationSchema = ValidationSchema,
+	TBody extends ValidationSchema = ValidationSchema
 > {
 	handler?: ErrorRequestHandler;
 	params?: TParams;
@@ -202,7 +202,7 @@ export type WeakRequestHandler = RequestHandler<Unvalidated, Unvalidated, Unvali
  * };
  * 
  */
-export type TypedRequest<T extends CompleteValidationSchema<ValidationSchema, ValidationSchema, ValidationSchema>> = Request<
+export type TypedRequest<T extends CompleteValidationSchema> = Request<
 	ZodOutput<T['params']>,
 	any,
 	ZodOutput<T['body']>,
