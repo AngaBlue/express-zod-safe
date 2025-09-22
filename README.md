@@ -48,6 +48,7 @@ import validate from 'express-zod-safe';
 import { z } from 'zod';
  
 const app = express();
+app.use(express.json());
  
 // Define your Zod schemas
 const params = {
@@ -175,8 +176,8 @@ const body = {
 app.post('/user', validate({ body }), (req, res) => {
   // req.body.name -> string
   // req.body.email -> string
-  // req.params.age -> Property 'age' does not exist on type '{}'
-  // req.query.age -> Property 'age' does not exist on type '{}'
+  // req.params.age -> Property 'age' does not exist on type unknown
+  // req.query.age -> Property 'age' does not exist on type unknown
 });
 ```
 
@@ -194,7 +195,7 @@ app.post('/user', validate({ body, params }), (req, res) => {
   // req.body.name -> string
   // req.body.email -> string
   // req.params.age -> any
-  // req.query.age -> Property 'age' does not exist on type '{}'
+  // req.query.age -> Property 'age' does not exist on type unknown
 });
 ```
 

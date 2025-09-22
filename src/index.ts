@@ -47,6 +47,7 @@ if (descriptor) {
  * import { z } from 'zod';
  *
  * const app = express();
+ * app.use(express.json());
  *
  * // Define your Zod schemas
  * const params = {
@@ -197,11 +198,12 @@ export type WeakRequestHandler = RequestHandler<Unvalidated, Unvalidated, Unvali
  * const requestHandler = (req: ValidatedRequest<typeof schema>, res: Response) => {
  * 	const { name, age } = req.query;
  * 	const { id } = req.params;
+ *  const { title } = req.body;
  *
- * 	res.send(`Hello ${name}! (Your age is ${age} and your ID is ${id})`);
+ * 	res.send(`Hello ${title} ${name}! (Your age is ${age} and your ID is ${id})`);
  * };
  *
- * app.get('/typed/:id', validate(schema), requestHandler);
+ * app.post('/handler/:id', validate(schema), requestHandler);
  */
 export type ValidatedRequest<T extends CompleteValidationSchema> = Request<
 	ZodOutput<T['params']>,
