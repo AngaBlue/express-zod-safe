@@ -1,29 +1,30 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { z } from 'zod';
-
-import validate, { type TypedRequest, type WeakRequestHandler } from '../src/index';
+import validate, { type CompleteValidationSchema, type ValidatedRequest, type WeakRequestHandler } from '../src/index';
 
 const app = express();
 const port = 3000;
+
+app.use(express.json())
 
 const authenticate = (_req: Request, _res: Response, next: NextFunction) => {
 	next();
 };
 
-const query = {
-	name: z.string().min(3).max(10),
-	age: z.coerce.number().min(18)
-};
+const schema = {
+	query: {
+		name: z.string().min(3).max(10),
+		age: z.coerce.number().min(18)
+	},
+	body: {
+		title: z.string().max(4)
+	},
+	params: {
+		id: z.coerce.number()
+	}
+} satisfies CompleteValidationSchema;
 
-const body = {
-	title: z.string().max(4)
-};
-
-const params = {
-	id: z.coerce.number()
-};
-
-app.get(
+app.post(
 	'/:id',
 	authenticate as WeakRequestHandler,
 	validate({
@@ -32,37 +33,25 @@ app.get(
 			res.status(400).send('Validation failed');
 			return;
 		},
-		body,
-		query,
-		params
+		...schema
 	}),
 	(req, res) => {
 		const { name, age } = req.query;
-		res.send(`Hello ${name}! (Your age is ${age})`);
+		const { id } = req.params;
+		// @ts-expect-error
+		const { notFound } = req.body;
+
+		res.send(`Hello ${name}! (Your age is ${age} and your ID is ${id})`);
 	}
 );
 
+const requestHandler = (req: ValidatedRequest<typeof schema>, res: Response) => {
+	const { name, age } = req.query;
+	const { id } = req.params;
 
-const typedSchema = {
-	params: z.object({
-		slug: z.string().min(1)
-	}),
-	query: z.object({
-		page: z.coerce.number().min(1)
-	}),
-	body: z.object({
-		title: z.string().min(1)
-	})
+	res.send(`Hello ${name}! (Your age is ${age} and your ID is ${id})`);
 };
 
-const typedHelper = (req: TypedRequest<typeof typedSchema>, res: Response) => {
-	const { slug } = req.params;
-	const { page } = req.query;
-	const { title } = req.body;
-
-	res.send(`Hello ${slug}! (Your page is ${page}) (Your title is ${title})`);
-};
-
-app.get('/typed/:slug', validate(typedSchema), typedHelper);
+app.post('/handler/:id', validate(schema), requestHandler);
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));
