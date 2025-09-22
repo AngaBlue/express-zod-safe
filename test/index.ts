@@ -5,7 +5,7 @@ import validate, { type CompleteValidationSchema, type ValidatedRequest, type We
 const app = express();
 const port = 3000;
 
-app.use(express.json())
+app.use(express.json());
 
 const authenticate = (_req: Request, _res: Response, next: NextFunction) => {
 	next();
@@ -39,17 +39,18 @@ app.post(
 		const { name, age } = req.query;
 		const { id } = req.params;
 		// @ts-expect-error
-		const { notFound } = req.body;
+		const { title, notFound } = req.body;
 
-		res.send(`Hello ${name}! (Your age is ${age} and your ID is ${id})`);
+		res.send(`Hello ${title} ${name}! (Your age is ${age} and your ID is ${id})`);
 	}
 );
 
 const requestHandler = (req: ValidatedRequest<typeof schema>, res: Response) => {
 	const { name, age } = req.query;
 	const { id } = req.params;
+	const { title } = req.body;
 
-	res.send(`Hello ${name}! (Your age is ${age} and your ID is ${id})`);
+	res.send(`Hello ${title} ${name}! (Your age is ${age} and your ID is ${id})`);
 };
 
 app.post('/handler/:id', validate(schema), requestHandler);
