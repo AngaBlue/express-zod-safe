@@ -72,12 +72,12 @@ app.listen(3000, () => console.log('Server running on port 3000'));
 
 **Note:** The `validate` middleware must be used **after** any other middleware that parses/modifies the request body, such as `express.json()` or `express.urlencoded()`.
 
-### 📄 Using `TypedRequest`
-When you want to type helper functions such as route handlers outside of the middleware chain, you can leverage the exported `TypedRequest` utility to infer the validated shapes. Pass the same Zod schemas you provide to `validate` and the resulting request type will be narrowed accordingly.
+### 📄 Using `ValidatedRequest`
+When you want to type the `Request` object outside of route handlers, you can use the `ValidatedRequest` utility to infer the validated types. Pass the same Zod schemas you provide to `validate` and the resulting `Request` type will be narrowed accordingly.
 
 ```ts
 import type { Response } from 'express';
-import validate, { type TypedRequest } from 'express-zod-safe';
+import validate, { type ValidatedRequest } from 'express-zod-safe';
 import { z } from 'zod';
 
 const bodySchema = z.object({
@@ -85,7 +85,7 @@ const bodySchema = z.object({
 	description: z.string().max(200)
 });
 
-type CreatePostRequest = TypedRequest<{ body: typeof bodySchema }>;
+type CreatePostRequest = ValidatedRequest<{ body: typeof bodySchema }>;
 
 function createPostHandler(req: CreatePostRequest, res: Response) {
 	// req.body.title -> string
@@ -95,8 +95,6 @@ function createPostHandler(req: CreatePostRequest, res: Response) {
 
 app.post('/posts', validate({ body: bodySchema }), createPostHandler);
 ```
-
-`TypedRequest` is flexible—omit schemas for any of `params`, `query`, or `body` and the corresponding request properties fall back to Express’ default types. This pattern shines when you separate route registration from controller implementations, letting each controller consume a strongly typed `req` without re-declaring the validation schemas.
 
 ### 📦 Custom Error Handling
 By default, the `validate` middleware will send a 400 Bad Request response with a JSON body containing the error message.  However, you can provide your own error handling function to customise the error response.
