@@ -117,6 +117,17 @@ app.post('/user/:userId', validate({ handler, params, query, body }), (req, res)
 });
 ```
 
+If you plan to use the same error handler across every route, use the `setGlobalErrorHandler`:
+
+
+```ts
+import { setGlobalErrorHandler } from 'express-zod-safe';
+
+setGlobalErrorHandler((errors, req, res) => {
+  // Your error handling here
+})
+```
+
 ### ⚠️ Usage with Additional Middleware
 When using `express-zod-safe` with other middleware, it is important not to explicitly type the `Request` parameter in the middleware, as this will override the inferred type that `express-zod-safe` generates from your validation schemas.  The best way to do this is to instead type your other middleware (or cast them) to `WeakRequestHandler`, a weakly typed version of the `RequestHandler` type from `express`.
 

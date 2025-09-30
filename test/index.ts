@@ -1,9 +1,18 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { z } from 'zod';
-import validate, { type CompleteValidationSchema, type ValidatedRequest, type WeakRequestHandler } from '../src/index';
+import validate, {
+	type CompleteValidationSchema,
+	setGlobalErrorHandler,
+	type ValidatedRequest,
+	type WeakRequestHandler
+} from '../src/index';
 
 const app = express();
 const port = 3000;
+
+setGlobalErrorHandler((_err, _req, res) => {
+	res.sendStatus(400);
+});
 
 app.use(express.json());
 

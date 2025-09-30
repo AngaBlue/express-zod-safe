@@ -5,6 +5,12 @@ import { type ZodError, type ZodRawShape, type ZodType, z } from 'zod';
 
 const types = ['query', 'params', 'body'] as const;
 
+export const defaultErrorHandler: ErrorRequestHandler = (errors, _req, res) => {
+	res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors.issues })));
+};
+
+let globalErrorHandler = defaultErrorHandler;
+
 /**
  * A ZodType type guard.
  * @param schema The Zod schema to check.
@@ -92,13 +98,16 @@ export default function validate<TParams extends ValidationSchema, TQuery extend
 		// Return all errors if there are any
 		if (errors.length > 0) {
 			// If a custom error handler is provided, use it
-			if (schemas.handler) return schemas.handler(errors, req, res, next);
-			res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors.issues })));
-			return;
+			const handler = schemas.handler ?? globalErrorHandler;
+			return handler(errors, req, res, next);
 		}
 
 		return next();
 	};
+}
+
+export function setGlobalErrorHandler(handler: ErrorRequestHandler): void {
+	globalErrorHandler = handler;
 }
 
 /**
