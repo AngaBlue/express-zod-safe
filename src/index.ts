@@ -37,6 +37,17 @@ export interface ValidateRequestGlobalOptions {
 	 * ```
 	 */
 	defaultSchemaObject: "strict" | "lax";
+	/**
+	 * The behavior when a schema is not provided for a particular input type (params, query, or body).
+	 * 
+	 * - `"empty"` (default): Validates against an empty strict object (`z.strictObject({})`), which rejects any input.
+	 * - `"any"`: Skips validation entirely for that input type, allowing any data to pass through.
+	 *   This is useful when using nested routers where different parts of the route validate different inputs.
+	 * 
+	 * @default "empty"
+	 * ```
+	 */
+	missingSchemaBehavior: "empty" | "any";
 };
 
 /**
@@ -44,11 +55,19 @@ export interface ValidateRequestGlobalOptions {
  * 
  * Default values:
  * - `defaultSchemaObject: "strict"`
+ * - `missingSchemaBehavior: "empty"`
+ * - `handler`: The default error handler sends a 400 status with an array of validation errors (see: {@link defaultErrorHandler}):
+ *     ```ts
+ *     (errors, _req, res) => {
+ *       res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors.issues })));
+ *     }
+ *     ```
  */
 export const DEFAULT_OPTIONS: ValidateRequestGlobalOptions = {
 	/** The error handler to use for all routes if no handler is provided in the schema. */
 	handler: defaultErrorHandler,
 	defaultSchemaObject: "strict",
+	missingSchemaBehavior: "empty",
 }
 
 /**
@@ -72,10 +91,14 @@ const options: ValidateRequestGlobalOptions = DEFAULT_OPTIONS;
  * // Change default schema object type
  * setGlobalOptions({ defaultSchemaObject: "lax" });
  * 
+ * // Change missing schema behavior
+ * setGlobalOptions({ missingSchemaBehavior: "any" });
+ * 
  * // Change all options
  * setGlobalOptions({
  *   handler: customHandler,
  *   defaultSchemaObject: "lax",
+ *   missingSchemaBehavior: "any"
  * });
  */
 export const setGlobalOptions = (newOptions: Partial<ValidateRequestGlobalOptions>) => {
@@ -110,8 +133,17 @@ if (descriptor) {
 /**
  * Generates a middleware function for Express.js that validates request params, query, and body.
  * This function uses Zod schemas to perform validation against the provided schema definitions.
+ * 
+ * **Missing Schema Behavior**: If a schema is not provided for a particular input type (params, query, or body),
+ * the behavior is controlled by the {@link ValidateRequestGlobalOptions.missingSchemaBehavior} option:
+ * - `"empty"` (default): Validates against an empty strict object, rejecting any input
+ * - `"any"`: Skips validation entirely, allowing any data to pass through
+ * 
+ * This allows you to validate only the parts of the request you care about when using nested routers.
  *
- * @param schemas - An object containing Zod schemas for params, query, and body.  Optional handler for custom error handling.
+ * @param schemas - An object containing Zod schemas for params, query, and body. All fields are optional.
+ *                  If a field is omitted, behavior depends on {@link ValidateRequestGlobalOptions.missingSchemaBehavior}.
+ *                  Optional handler for custom error handling.
  * @returns An Express.js middleware function that validates the request based on the provided schemas.
  *          It attaches validated data to the request object and sends error details if validation fails.
  * @template TParams - Type definition for params schema.
@@ -143,19 +175,31 @@ if (descriptor) {
  *   // Your route logic here
  *   res.send('User data is valid!');
  * });
+ * 
+ * // Only validate params, allow any query or body
+ * setGlobalOptions({ missingSchemaBehavior: "any" });
+ * app.use('/:id', validate({ params: { id: z.string().uuid() } }), nestedRouter);
  *
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
 export default function validate<TParams extends ValidationSchema, TQuery extends ValidationSchema, TBody extends ValidationSchema>(
 	schemas: CompleteValidationSchema<TParams, TQuery, TBody>
 ): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
-	// Create validation objects for each type
-	const zodObject = options.defaultSchemaObject === "strict" ? z.strictObject : z.object;
-	const validation = {
-		params: isZodType(schemas.params) ? schemas.params : zodObject(schemas.params ?? {}),
-		query: isZodType(schemas.query) ? schemas.query : zodObject(schemas.query ?? {}),
-		body: isZodType(schemas.body) ? schemas.body : zodObject(schemas.body ?? {})
+	// Initialize validation objects for each type
+	const missingSchemaHandler = options.missingSchemaBehavior === "empty" ? z.strictObject({}) : z.any();
+	const validation: Record<DataType, ZodType> = {
+		params: missingSchemaHandler,
+		query: missingSchemaHandler,
+		body: missingSchemaHandler,
 	};
+
+	// Set validation objects for each type
+	const zodObject = options.defaultSchemaObject === "strict" ? z.strictObject : z.object;
+	for (const type of types) {
+		if (schemas[type]) {
+			validation[type] = isZodType(schemas[type]) ? schemas[type] : zodObject(schemas[type]);
+		}
+	}
 
 	return async (req, res, next): Promise<void> => {
 		const errors: ErrorListItem[] = [];
