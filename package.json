@@ -20,7 +20,8 @@
 	"scripts": {
 		"build": "tsup",
 		"lint": "biome check --fix",
-		"test": "pnpx tsx ./test/index.ts"
+		"test": "node --import=tsx --test test/index.test.ts && tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+		"test:debug": "node --import=tsx --test --inspect-brk test/index.test.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -49,6 +50,7 @@
 		"@biomejs/biome": "^2.1.2",
 		"@types/node": "^24.1.0",
 		"tsup": "^8.5.0",
+		"tsx": "^4.21.0",
 		"typescript": "^5.8.3",
 		"zod": "^4.0.10"
 	},

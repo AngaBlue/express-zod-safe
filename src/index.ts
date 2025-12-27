@@ -45,7 +45,6 @@ export interface ValidateRequestGlobalOptions {
 	 *   This is useful when using nested routers where different parts of the route validate different inputs.
 	 * 
 	 * @default "empty"
-	 * ```
 	 */
 	missingSchemaBehavior: "empty" | "any";
 };
