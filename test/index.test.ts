@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { before, describe, it, test } from 'node:test';
+import { before, beforeEach, describe, it, test } from 'node:test';
 
 import { type IRouterMatcher, type Request, type Response } from 'express';
 import { z } from 'zod';
 
-import validate, { setGlobalOptions } from '../src/index.js';
+import validate, { DEFAULT_OPTIONS, setGlobalOptions } from '../src/index.js';
 
 // Mocks
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,7 +41,7 @@ describe('Default options', () => {
         assert.strictEqual(wasCalled(), true);
     });
     
-    void it('should throw with invalid body', async () => {
+    void it('should not call next with invalid body', async () => {
         const schema = z.object({ name: z.string() });
         const middleware = validate({
             body: schema,
@@ -57,7 +57,7 @@ describe('Default options', () => {
         assert.strictEqual(wasCalled(), false);
     });
     
-    void it('should throw with invalid query', async () => {
+    void it('should not call next with invalid query', async () => {
         const schema = z.object({ name: z.string() });
         const middleware = validate({
             body: schema,
@@ -73,7 +73,7 @@ describe('Default options', () => {
         assert.strictEqual(wasCalled(), false);
     });
     
-    void it('should throw with invalid params', async () => {
+    void it('should not call next with invalid params', async () => {
         const schema = z.object({ name: z.string() });
         const middleware = validate({
             body: schema,
@@ -89,7 +89,7 @@ describe('Default options', () => {
         assert.strictEqual(wasCalled(), false);
     });
     
-    void it('should throw when schema is not provided and data is provided', async () => {
+    void it('should not call next when schema is not provided and data is provided', async () => {
         const schema = z.object({ name: z.string() });
         const middleware = validate({
             body: schema,
@@ -104,12 +104,13 @@ describe('Default options', () => {
     });
 });
 
-describe('{ missingSchemaBehavior: "any" }', () => {
-    before(() => {
-        setGlobalOptions({ missingSchemaBehavior: "any" });
-    });
+describe('Custom options', () => {
+    void it('should pass when schema is not provided and data is provided with { missingSchemaBehavior: "any" }', async () => {
+        setGlobalOptions({
+            ...DEFAULT_OPTIONS,
+            missingSchemaBehavior: "any"
+        });
 
-    void it('should pass when schema is not provided and data is provided', async () => {
         const schema = z.object({ name: z.string() });
         const middleware = validate({
             body: schema,
@@ -122,14 +123,13 @@ describe('{ missingSchemaBehavior: "any" }', () => {
         await middleware(req, res, next);
         assert.strictEqual(wasCalled(), true);
     });
-});
 
-describe('{ defaultSchemaObject: "lax" }', () => {
-    before(() => {
-        setGlobalOptions({ defaultSchemaObject: "lax" });
-    });
+    void it('should pass with valid data and extra properties with { defaultSchemaObject: "lax" }', async () => {
+        setGlobalOptions({
+            ...DEFAULT_OPTIONS,
+            defaultSchemaObject: "lax"
+        });
 
-    void it('should pass with valid data and extra properties', async () => {
         const schema = z.object({ name: z.string() });
         const middleware = validate({
             body: schema,
@@ -142,7 +142,27 @@ describe('{ defaultSchemaObject: "lax" }', () => {
         await middleware(req, res, next);
         assert.strictEqual(wasCalled(), true);
         assert.deepStrictEqual(req.body, { name: 'John Doe' });
-        
+    });
+
+    void it('should call custom handler when validation fails with { handler: customHandler }', async () => {
+        let didFail = false;
+        setGlobalOptions({
+            ...DEFAULT_OPTIONS,
+            handler: () => {
+                didFail = true;
+            }
+        });
+
+        const schema = z.object({ name: z.string() });
+        const middleware = validate({ body: schema });
+
+        const req = mockRequest({ body: { name: 2 } });
+        const res = mockResponse();
+        const { next, wasCalled } = mockNext();
+
+        await middleware(req, res, next);
+        assert.strictEqual(wasCalled(), false);
+        assert.strictEqual(didFail, true);
     });
 });
 
