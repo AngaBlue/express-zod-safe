@@ -121,7 +121,7 @@ If you plan to use the same error handler across every route, use `setGlobalOpti
 
 
 ```ts
-import { setGlobalErrorHandler } from 'express-zod-safe';
+import { setGlobalOptions } from 'express-zod-safe';
 
 setGlobalOptions({
   handler: (errors, req, res) => {
@@ -215,8 +215,37 @@ app.post('/user', validate({ body, params }), (req, res) => {
 To enable this behaviour globally without the need to explicitly set `z.any()` in each instance, use `setGlobalOptions`:
 
 ```ts
+import { setGlobalOptions } from 'express-zod-safe';
+
 setGlobalOptions({
   missingSchemaBehavior: 'any'
+});
+```
+
+### ⚠️ Default Schema Object Strictness
+When a plain JavaScript object is supplied instead of a Zod schema object, the default behaviour is to assume `z.strictObject`.  This means that additional keys will cause validation to fail.  To override this behaviour, use `z.object()` explicitly:
+
+```ts
+// z.object allows additional keys
+const body = z.object({
+  name: z.string(),
+  email: z.string().email(),
+});
+
+app.post('/user', validate({ body }), (req, res) => {
+  // ...
+});
+```
+
+*Note: in both instances, additional keys will be stripped from the output.  The difference lies in whether additional keys throw a validation error or are silently removed.*
+
+To enable this behaviour globally without the need to explicitly set `z.object()` in each instance, use `setGlobalOptions`:
+
+```ts
+import { setGlobalOptions } from 'express-zod-safe';
+
+setGlobalOptions({
+  defaultSchemaObject: 'lax'
 });
 ```
 
