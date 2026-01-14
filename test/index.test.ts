@@ -5,6 +5,7 @@ import { z } from 'zod';
 import validate, { DEFAULT_OPTIONS, setGlobalOptions } from '../src/index.js';
 
 // Mocks
+// biome-ignore lint/suspicious/noExplicitAny: request type will be determined by validate middleware
 const mockRequest = (data = {}) => ({ body: {}, query: {}, params: {}, ...data }) as unknown as Request<any, any, any, any>;
 const mockResponse = () =>
 	({
