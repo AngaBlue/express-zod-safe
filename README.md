@@ -212,6 +212,14 @@ app.post('/user', validate({ body, params }), (req, res) => {
 });
 ```
 
+To enable this behaviour globally without the need to explicitly set `z.any()` in each instance, use `setGlobalOptions`:
+
+```ts
+setGlobalOptions({
+  missingSchemaBehavior: 'any'
+});
+```
+
 ## ⭐️ Show your support
 
 Give a ⭐️ on GitHub if this project helped you!
