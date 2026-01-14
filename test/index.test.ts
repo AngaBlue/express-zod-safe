@@ -1,25 +1,27 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: any used not yet defined request body/params/query shape */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { IRouterMatcher, Request, Response } from 'express';
+import type { IRouterMatcher } from 'express';
+import httpMocks from 'node-mocks-http';
 import { z } from 'zod';
 import validate, { DEFAULT_OPTIONS, setGlobalOptions } from '../src/index.js';
 
-// Mocks
-// biome-ignore lint/suspicious/noExplicitAny: request type will be determined by validate middleware
-const mockRequest = (data = {}) => ({ body: {}, query: {}, params: {}, ...data }) as unknown as Request<any, any, any, any>;
-const mockResponse = () =>
-	({
-		status: () => ({
-			send: () => {}
-		})
-	}) as unknown as Response;
-const mockNext = () => {
+// Mock Request, Response & Next
+const makeReqResNext = (overrides?: Partial<httpMocks.MockRequest<any>>) => {
+	const req = httpMocks.createRequest<any>({
+		method: 'POST',
+		...overrides
+	});
+
+	const res = httpMocks.createResponse();
+
 	let called = false;
-	const next = () => {
+	const next = (err?: unknown) => {
+		if (err) throw err;
 		called = true;
 	};
 
-	return { next, wasCalled: () => called };
+	return { req, res, next, wasCalled: () => called };
 };
 
 // Tests
@@ -32,9 +34,11 @@ describe('Default options', () => {
 			params: schema
 		});
 
-		const req = mockRequest({ body: { name: 'John Doe' }, query: { name: 'John Doe' }, params: { name: 'John Doe' } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({
+			body: { name: 'John Doe' },
+			query: { name: 'John Doe' },
+			params: { name: 'John Doe' }
+		});
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), true);
@@ -48,9 +52,7 @@ describe('Default options', () => {
 			params: schema
 		});
 
-		const req = mockRequest({ body: { name: 2 }, query: { name: 'John Doe' }, params: { name: 'John Doe' } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({ body: { name: 2 }, query: { name: 'John Doe' }, params: { name: 'John Doe' } });
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), false);
@@ -64,9 +66,7 @@ describe('Default options', () => {
 			params: schema
 		});
 
-		const req = mockRequest({ body: { name: 'John Doe' }, query: {}, params: { name: 'John Doe' } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({ body: { name: 'John Doe' }, query: {}, params: { name: 'John Doe' } });
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), false);
@@ -80,9 +80,11 @@ describe('Default options', () => {
 			params: schema
 		});
 
-		const req = mockRequest({ body: { name: 'John Doe' }, query: { name: 'John Doe' }, params: { name1: 'John Doe' } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({
+			body: { name: 'John Doe' },
+			query: { name: 'John Doe' },
+			params: { name1: 'John Doe' }
+		});
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), false);
@@ -94,9 +96,7 @@ describe('Default options', () => {
 			body: schema
 		});
 
-		const req = mockRequest({ body: { name: 'John Doe' }, query: { foo: 'bar' } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({ body: { name: 'John Doe' }, query: { foo: 'bar' } });
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), false);
@@ -115,9 +115,7 @@ describe('Custom options', () => {
 			body: schema
 		});
 
-		const req = mockRequest({ body: { name: 'John Doe' }, query: { foo: 'bar' } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({ body: { name: 'John Doe' }, query: { foo: 'bar' } });
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), true);
@@ -134,9 +132,7 @@ describe('Custom options', () => {
 			body: schema
 		});
 
-		const req = mockRequest({ body: { name: 'John Doe', foo: 'bar' } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({ body: { name: 'John Doe', foo: 'bar' } });
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), true);
@@ -155,9 +151,7 @@ describe('Custom options', () => {
 		const schema = z.object({ name: z.string() });
 		const middleware = validate({ body: schema });
 
-		const req = mockRequest({ body: { name: 2 } });
-		const res = mockResponse();
-		const { next, wasCalled } = mockNext();
+		const { req, res, next, wasCalled } = makeReqResNext({ body: { name: 2 } });
 
 		await middleware(req, res, next);
 		assert.strictEqual(wasCalled(), false);

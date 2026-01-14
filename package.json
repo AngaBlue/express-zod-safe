@@ -49,6 +49,7 @@
 		"@angablue/biome-config": "^1.1.1",
 		"@biomejs/biome": "^2.3.11",
 		"@types/node": "^25.0.8",
+		"node-mocks-http": "^1.17.2",
 		"tsup": "^8.5.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
