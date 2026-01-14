@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { IRouterMatcher, Request, Response } from 'express';
 import { z } from 'zod';
-
 import validate, { DEFAULT_OPTIONS, setGlobalOptions } from '../src/index.js';
 
 // Mocks
