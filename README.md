@@ -117,14 +117,16 @@ app.post('/user/:userId', validate({ handler, params, query, body }), (req, res)
 });
 ```
 
-If you plan to use the same error handler across every route, use the `setGlobalErrorHandler`:
+If you plan to use the same error handler across every route, use `setGlobalOptions`:
 
 
 ```ts
 import { setGlobalErrorHandler } from 'express-zod-safe';
 
-setGlobalErrorHandler((errors, req, res) => {
-  // Your error handling here
+setGlobalOptions({
+  handler: (errors, req, res) => {
+    // Your error handling here
+  }
 })
 ```
 
