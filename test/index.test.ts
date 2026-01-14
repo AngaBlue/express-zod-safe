@@ -1,14 +1,14 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: any used not yet defined request body/params/query shape */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { IRouterMatcher } from 'express';
+import type { IRouterMatcher, Request } from 'express';
 import httpMocks from 'node-mocks-http';
 import { z } from 'zod';
 import validate, { DEFAULT_OPTIONS, setGlobalOptions } from '../src/index.js';
 
 // Mock Request, Response & Next
-const makeReqResNext = (overrides?: Partial<httpMocks.MockRequest<any>>) => {
-	const req = httpMocks.createRequest<any>({
+const makeReqResNext = (overrides = {} as httpMocks.RequestOptions) => {
+	// biome-ignore lint/suspicious/noExplicitAny: any used not yet defined request body/params/query shape
+	const req = httpMocks.createRequest<Request<any, unknown, any, any>>({
 		method: 'POST',
 		...overrides
 	});
