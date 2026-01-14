@@ -185,16 +185,17 @@ if (descriptor) {
 export default function validate<TParams extends ValidationSchema, TQuery extends ValidationSchema, TBody extends ValidationSchema>(
 	schemas: CompleteValidationSchema<TParams, TQuery, TBody>
 ): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
+	// Set validation objects for each type
+	const zodObject = options.defaultSchemaObject === 'strict' ? z.strictObject : z.object;
+
 	// Initialise validation objects for each type
-	const missingSchemaHandler = options.missingSchemaBehavior === 'empty' ? z.strictObject({}) : z.any();
+	const missingSchemaHandler = options.missingSchemaBehavior === 'empty' ? zodObject({}) : z.any();
 	const validation: Record<DataType, ZodType> = {
 		params: missingSchemaHandler,
 		query: missingSchemaHandler,
 		body: missingSchemaHandler
 	};
 
-	// Set validation objects for each type
-	const zodObject = options.defaultSchemaObject === 'strict' ? z.strictObject : z.object;
 	for (const type of types) {
 		if (schemas[type]) {
 			validation[type] = isZodType(schemas[type]) ? schemas[type] : zodObject(schemas[type]);
