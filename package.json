@@ -13,12 +13,12 @@
 			},
 			"require": {
 				"types": "./dist/index.d.ts",
-				"default": "./dist/index.js"
+				"default": "./dist/index.cjs"
 			}
 		}
 	},
 	"scripts": {
-		"build": "tsup",
+		"build": "tsup && node postbuild.js",
 		"lint": "biome check --fix",
 		"test": "node --import=tsx --test test/index.test.ts && tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
 		"test:debug": "node --import=tsx --test --inspect-brk test/index.test.ts"
