@@ -30,6 +30,9 @@ const schema = {
 	},
 	params: {
 		id: z.coerce.number()
+	},
+	headers: {
+		'x-header': z.uuidv4()
 	}
 } satisfies CompleteValidationSchema;
 

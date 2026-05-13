@@ -3,7 +3,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import express from 'express';
 import { type ZodError, type ZodRawShape, type ZodType, z } from 'zod';
 
-const types = ['query', 'params', 'body'] as const;
+const types = ['query', 'params', 'body', 'headers'] as const;
 
 export const defaultErrorHandler: ErrorRequestHandler = (errors, _req, res) => {
 	res.status(400).send(errors.map(error => ({ type: error.type, errors: error.errors.issues })));
@@ -149,6 +149,7 @@ if (descriptor) {
  * @template TParams - Type definition for params schema.
  * @template TQuery - Type definition for query schema.
  * @template TBody - Type definition for body schema.
+ * @template THeaders - Type definition for headers schema.
  * @example
  * // Example usage in an Express.js route
  * import express from 'express';
@@ -182,8 +183,13 @@ if (descriptor) {
  *
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
-export default function validate<TParams extends ValidationSchema, TQuery extends ValidationSchema, TBody extends ValidationSchema>(
-	schemas: CompleteValidationSchema<TParams, TQuery, TBody>
+export default function validate<
+	TParams extends ValidationSchema,
+	TQuery extends ValidationSchema,
+	TBody extends ValidationSchema,
+	THeaders extends ValidationSchema
+>(
+	schemas: CompleteValidationSchema<TParams, TQuery, TBody, THeaders>
 ): RequestHandler<ZodOutput<TParams>, any, ZodOutput<TBody>, ZodOutput<TQuery>> {
 	// Set validation objects for each type
 	const zodObject = options.defaultSchemaObject === 'strict' ? z.strictObject : z.object;
@@ -193,7 +199,8 @@ export default function validate<TParams extends ValidationSchema, TQuery extend
 	const validation: Record<DataType, ZodType> = {
 		params: missingSchemaHandler,
 		query: missingSchemaHandler,
-		body: missingSchemaHandler
+		body: missingSchemaHandler,
+		headers: z.any()
 	};
 
 	for (const type of types) {
@@ -204,6 +211,8 @@ export default function validate<TParams extends ValidationSchema, TQuery extend
 
 	return async (req, res, next): Promise<void> => {
 		const errors: ErrorListItem[] = [];
+
+		req.headers;
 
 		// Validate all types (params, query, body)
 		for (const type of types) {
@@ -234,12 +243,12 @@ export function setGlobalErrorHandler(handler: ErrorRequestHandler): void {
 }
 
 /**
- * Describes the types of data that can be validated: 'query', 'params', or 'body'.
+ * Describes the types of data that can be validated: 'query', 'params', 'body' or 'headers'.
  */
 type DataType = (typeof types)[number];
 
 /**
- * Defines the structure of an error item, containing the type of validation that failed (params, query, or body)
+ * Defines the structure of an error item, containing the type of validation that failed (params, query, body or headers)
  * and the associated ZodError.
  */
 export interface ErrorListItem {
@@ -266,7 +275,7 @@ export type ErrorRequestHandler<
 ) => void | Promise<void>;
 
 /**
- * Represents a generic type for route validation, which can be applied to params, query, or body.
+ * Represents a generic type for route validation, which can be applied to params, query, body or headers.
  * Each key-value pair represents a field and its corresponding Zod validation schema.
  */
 export type ValidationSchema = ZodType | ZodRawShape;
@@ -283,12 +292,14 @@ export type ValidationSchema = ZodType | ZodRawShape;
 export interface CompleteValidationSchema<
 	TParams extends ValidationSchema = ValidationSchema,
 	TQuery extends ValidationSchema = ValidationSchema,
-	TBody extends ValidationSchema = ValidationSchema
+	TBody extends ValidationSchema = ValidationSchema,
+	THeaders extends ValidationSchema = ValidationSchema
 > {
 	handler?: ErrorRequestHandler;
 	params?: TParams;
 	query?: TQuery;
 	body?: TBody;
+	headers?: THeaders;
 }
 
 /**
